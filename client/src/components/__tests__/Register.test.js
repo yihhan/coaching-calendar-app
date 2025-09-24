@@ -1,17 +1,24 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { BrowserRouter } from 'react-router-dom';
 import Register from '../Register';
 
 // Mock the AuthContext
+const mockRegister = jest.fn();
 const mockUseAuth = {
-  register: jest.fn(),
+  register: mockRegister,
   user: null,
   loading: false
 };
 
 jest.mock('../../contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth
+}));
+
+// Mock the API service
+jest.mock('../../services/api', () => ({
+  post: jest.fn(() => Promise.resolve({ data: { success: true } }))
 }));
 
 // Mock window.location
@@ -41,13 +48,14 @@ const renderRegister = () => {
 describe('Register Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockRegister.mockClear();
     window.location.href = '';
   });
 
   test('renders registration form', () => {
     renderRegister();
     
-    expect(screen.getByText('Register')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Register' })).toBeInTheDocument();
     expect(screen.getByLabelText('Full Name')).toBeInTheDocument();
     expect(screen.getByLabelText('Email')).toBeInTheDocument();
     expect(screen.getByLabelText('I am a')).toBeInTheDocument();
@@ -57,7 +65,7 @@ describe('Register Component', () => {
   test('renders Google registration button', () => {
     renderRegister();
     
-    expect(screen.getByText('Continue with Google')).toBeInTheDocument();
+    expect(screen.getByText('Sign up with Google')).toBeInTheDocument();
   });
 
   test('Google registration redirects to correct URL with role in production', () => {
@@ -70,7 +78,7 @@ describe('Register Component', () => {
     const roleSelect = screen.getByLabelText('I am a');
     fireEvent.change(roleSelect, { target: { value: 'coach' } });
     
-    const googleButton = screen.getByText('Continue with Google');
+    const googleButton = screen.getByText('Sign up with Google');
     fireEvent.click(googleButton);
     
     expect(window.location.href).toBe('https://calla.sg/api/auth/google/coach');
@@ -86,7 +94,7 @@ describe('Register Component', () => {
     const roleSelect = screen.getByLabelText('I am a');
     fireEvent.change(roleSelect, { target: { value: 'student' } });
     
-    const googleButton = screen.getByText('Continue with Google');
+    const googleButton = screen.getByText('Sign up with Google');
     fireEvent.click(googleButton);
     
     expect(window.location.href).toBe('https://calla.sg/api/auth/google/student');
@@ -98,7 +106,7 @@ describe('Register Component', () => {
     
     renderRegister();
     
-    const googleButton = screen.getByText('Continue with Google');
+    const googleButton = screen.getByText('Sign up with Google');
     fireEvent.click(googleButton);
     
     expect(window.location.href).toBe('http://localhost:5000/api/auth/google/student');
@@ -117,6 +125,6 @@ describe('Register Component', () => {
     fireEvent.change(roleSelect, { target: { value: 'coach' } });
     fireEvent.click(submitButton);
     
-    expect(mockUseAuth.register).toHaveBeenCalledWith('John Doe', 'john@example.com', 'coach');
+    expect(mockRegister).toHaveBeenCalledWith('John Doe', 'john@example.com', 'coach');
   });
 });

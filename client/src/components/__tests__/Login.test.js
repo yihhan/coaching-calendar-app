@@ -1,17 +1,24 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { BrowserRouter } from 'react-router-dom';
 import Login from '../Login';
 
 // Mock the AuthContext
+const mockLogin = jest.fn();
 const mockUseAuth = {
-  login: jest.fn(),
+  login: mockLogin,
   user: null,
   loading: false
 };
 
 jest.mock('../../contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth
+}));
+
+// Mock the API service
+jest.mock('../../services/api', () => ({
+  post: jest.fn(() => Promise.resolve({ data: { success: true } }))
 }));
 
 // Mock window.location
@@ -41,6 +48,7 @@ const renderLogin = () => {
 describe('Login Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockLogin.mockClear();
     window.location.href = '';
   });
 
@@ -94,6 +102,6 @@ describe('Login Component', () => {
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
     fireEvent.click(submitButton);
     
-    expect(mockUseAuth.login).toHaveBeenCalledWith('test@example.com', 'password123');
+    expect(mockLogin).toHaveBeenCalledWith('test@example.com', 'password123');
   });
 });
