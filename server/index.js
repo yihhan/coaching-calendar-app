@@ -40,7 +40,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET &&
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.NODE_ENV === 'production' 
-      ? `${process.env.FRONTEND_URL}/api/auth/google/callback`
+      ? 'https://calla.sg/api/auth/google/callback'
       : 'http://localhost:5000/api/auth/google/callback',
     passReqToCallback: true
   }, async (req, accessToken, refreshToken, profile, done) => {
@@ -388,12 +388,6 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET &&
     });
   });
   
-  app.get('/api/auth/google/callback', (req, res) => {
-    res.status(400).json({ 
-      error: 'Google OAuth not configured', 
-      message: 'Please configure Google OAuth credentials in your .env file' 
-    });
-  });
 }
 
 // Test endpoint to verify Google OAuth setup
