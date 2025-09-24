@@ -92,7 +92,7 @@ const Profile = () => {
                     <strong>Name:</strong> {profile?.name}
                   </div>
                 ) : (
-                  <form onSubmit={handleSave} className="mb-3">
+                  <div className="mb-3">
                     <label htmlFor="name" className="form-label">Name</label>
                     <input
                       id="name"
@@ -103,11 +103,7 @@ const Profile = () => {
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
                       required
                     />
-                    <div className="mt-2 d-flex gap-2">
-                      <button type="submit" className="btn btn-success btn-sm">Save</button>
-                      <button type="button" className="btn btn-secondary btn-sm" onClick={() => setEditing(false)}>Cancel</button>
-                    </div>
-                  </form>
+                  </div>
                 )}
                 <div className="mb-2">
                   <strong>Email:</strong> {profile?.email}
@@ -137,7 +133,7 @@ const Profile = () => {
                     )}
                   </>
                 ) : (
-                  <form onSubmit={handleSave} className="mb-3">
+                  <div className="mb-3">
                     <textarea
                       id="description"
                       name="description"
@@ -148,7 +144,7 @@ const Profile = () => {
                       onChange={(e) => setForm({ ...form, description: e.target.value })}
                       placeholder="Tell students about your experience, approach, and what you offer"
                     />
-                  </form>
+                  </div>
                 )}
                 
               </div>
@@ -210,17 +206,19 @@ const Profile = () => {
                       styles={{ container: (base) => ({ ...base, width: '100%' }) }}
                       placeholder="Search and select expertise..."
                     />
-
-                    <div className="mt-3 d-flex gap-2">
-                      <button type="button" className="btn btn-success" onClick={handleSave}>Save</button>
-                      <button type="button" className="btn btn-secondary" onClick={() => setEditing(false)}>Cancel</button>
-                    </div>
                   </div>
                 )}
               </div>
             </div>
             )}
           </div>
+          
+          {profile?.role === 'coach' && editing && (
+            <div className="d-flex justify-content-end gap-2 mt-3">
+              <button type="button" className="btn btn-success" onClick={handleSave}>Save Changes</button>
+              <button type="button" className="btn btn-secondary" onClick={() => setEditing(false)}>Cancel</button>
+            </div>
+          )}
           
           {profile?.role === 'coach' && (
             <div className="card mt-3">
