@@ -52,7 +52,8 @@ const Register = () => {
   const handleGoogleLogin = () => {
     // Get the selected role from the form
     const role = formData.role;
-    window.location.href = `http://localhost:5000/api/auth/google/${role}`;
+    const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    window.location.href = `${baseUrl}/api/auth/google/${role}`;
   };
 
   return (
