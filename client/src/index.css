@@ -103,6 +103,46 @@ nav .btn {
   white-space: nowrap;
 }
 
+/* Mobile Navigation */
+.mobile-nav {
+  display: none;
+}
+
+.desktop-nav {
+  display: flex;
+}
+
+/* Ensure Bootstrap responsive classes work properly */
+@media (max-width: 767.98px) {
+  .d-md-none {
+    display: block !important;
+  }
+  .d-md-flex {
+    display: none !important;
+  }
+  .mobile-nav {
+    display: block !important;
+  }
+  .desktop-nav {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .d-md-none {
+    display: none !important;
+  }
+  .d-md-flex {
+    display: flex !important;
+  }
+  .mobile-nav {
+    display: none !important;
+  }
+  .desktop-nav {
+    display: flex !important;
+  }
+}
+
 .form-group {
   margin-bottom: 20px;
 }
