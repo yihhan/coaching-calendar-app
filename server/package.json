@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "purge:google": "node tools/purgeGoogleUsers.js"
   },
   "dependencies": {
@@ -21,6 +23,8 @@
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "jest": "^29.5.0",
+    "supertest": "^6.3.3"
   }
 }
