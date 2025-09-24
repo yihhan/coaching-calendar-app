@@ -1,7 +1,17 @@
 import axios from 'axios';
 
+// Determine the API base URL dynamically
+const getApiBaseUrl = () => {
+  // If we're in development (localhost:3000), use localhost:5000
+  if (window.location.origin === 'http://localhost:3000') {
+    return 'http://localhost:5000/api';
+  }
+  // For production, use the current origin
+  return `${window.location.origin}/api`;
+};
+
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/api` : '/api',
+  baseURL: getApiBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
