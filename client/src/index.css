@@ -1,0 +1,610 @@
+:root {
+  --color-bg: #f8fafc; /* slate-50 */
+  --color-text: #0f172a; /* slate-900 */
+  --color-muted: #64748b; /* slate-500 */
+  --primary-500: #4f46e5; /* indigo-600 */
+  --primary-600: #4338ca;
+  --secondary-500: #475569; /* slate-600 */
+  --secondary-600: #334155;
+  --success-500: #16a34a; /* green-600 */
+  --danger-500: #ef4444; /* red-500 - darker than red-400 */
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0; /* slate-200 */
+  --shadow-sm: 0 1px 2px rgba(2, 6, 23, 0.06), 0 1px 3px rgba(2, 6, 23, 0.1);
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* Ensure link-styled buttons never show underline */
+a.btn, a.btn:hover, a.btn:focus, a.btn:active, a.btn:visited {
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: var(--primary-500);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-600);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-500);
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-600);
+}
+
+.btn-success {
+  background-color: var(--success-500);
+  color: #fff;
+}
+
+.btn-success:hover {
+  background-color: #1e7e34;
+}
+
+.btn-danger {
+  background-color: var(--danger-500);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* Navbar button styling - make all buttons same width and height */
+nav .btn {
+  min-width: 140px;
+  min-height: 40px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-header {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 22px;
+  color: var(--color-text);
+}
+
+.grid {
+  display: grid;
+  gap: 20px;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: var(--color-muted);
+}
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 10px; }
+.mb-2 { margin-bottom: 20px; }
+.mb-3 { margin-bottom: 30px; }
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 10px; }
+.mt-2 { margin-top: 20px; }
+.mt-3 { margin-top: 30px; }
+
+.p-0 { padding: 0; }
+.p-1 { padding: 10px; }
+.p-2 { padding: 20px; }
+.p-3 { padding: 30px; }
+
+.d-flex {
+  display: flex;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.gap-1 { gap: 10px; }
+.gap-2 { gap: 20px; }
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 10px;
+  }
+  
+  .grid-2,
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+  
+  .d-flex {
+    flex-direction: column;
+  }
+  
+  /* Mobile Calendar Optimizations */
+  .calendar-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .calendar-header h3 {
+    font-size: 1.2rem;
+    margin: 0;
+  }
+  
+  .calendar-navigation {
+    justify-content: center;
+  }
+  
+  .calendar-weekdays {
+    font-size: 0.8rem;
+  }
+  
+  .calendar-weekday {
+    padding: 8px 4px;
+  }
+  
+  .calendar-day {
+    min-height: 80px;
+    padding: 4px;
+  }
+  
+  .day-number {
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+  }
+  
+  .session-item {
+    padding: 1px 2px;
+    margin-bottom: 1px;
+  }
+  
+  .session-time {
+    font-size: 0.7rem;
+  }
+  
+  .session-title {
+    font-size: 0.65rem;
+  }
+  
+  .session-coach {
+    font-size: 0.6rem;
+  }
+  
+  .more-sessions {
+    font-size: 0.6rem;
+  }
+  
+  /* Week view mobile */
+  .calendar-week-day {
+    min-height: 150px;
+    padding: 6px;
+  }
+  
+  /* Day view mobile */
+  .session-card {
+    padding: 10px;
+  }
+  
+  .session-header h5 {
+    font-size: 1rem;
+  }
+  
+  .session-price {
+    font-size: 0.8rem;
+    padding: 2px 6px;
+  }
+  
+  /* Filter controls mobile */
+  .row.mb-3 {
+    margin-bottom: 15px;
+  }
+  
+  .col-md-4 {
+    margin-bottom: 10px;
+  }
+  
+  .form-label {
+    font-size: 0.9rem;
+    margin-bottom: 3px;
+  }
+  
+  .form-select,
+  .form-control {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+}
+
+/* Extra small screens (phones in portrait) */
+@media (max-width: 480px) {
+  .calendar-day {
+    min-height: 70px;
+    padding: 2px;
+  }
+  
+  .calendar-weekday {
+    padding: 6px 2px;
+    font-size: 0.7rem;
+  }
+  
+  .day-number {
+    font-size: 0.8rem;
+  }
+  
+  .session-item {
+    padding: 1px;
+  }
+  
+  .session-time {
+    font-size: 0.6rem;
+  }
+  
+  .session-title {
+    font-size: 0.6rem;
+  }
+  
+  .session-coach {
+    font-size: 0.55rem;
+  }
+  
+  .calendar-header h3 {
+    font-size: 1rem;
+  }
+  
+  .btn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .card {
+    padding: 15px;
+  }
+  
+  .card-header h2 {
+    font-size: 1.3rem;
+  }
+}
+
+/* Calendar Styles */
+.calendar-container {
+  margin-top: 20px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.calendar-navigation {
+  display: flex;
+  gap: 10px;
+}
+
+.calendar-grid {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background-color: #f8f9fa;
+}
+
+.calendar-weekday {
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  border-right: 1px solid #dee2e6;
+}
+
+.calendar-weekday:last-child {
+  border-right: none;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day {
+  min-height: 120px;
+  border-right: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+  padding: 8px;
+  position: relative;
+}
+
+.calendar-day:last-child {
+  border-right: none;
+}
+
+.calendar-day.empty {
+  background-color: #f8f9fa;
+}
+
+.calendar-day.has-date {
+  background-color: white;
+}
+
+.calendar-day.has-date:hover {
+  background-color: #f8f9fa;
+}
+
+.day-number {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.day-sessions {
+  font-size: 0.8rem;
+}
+
+.session-item {
+  background-color: #e3f2fd;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin-bottom: 2px;
+  border-left: 3px solid #2196f3;
+}
+
+/* Session availability status styles */
+.session-item.session-available {
+  background-color: #e3f2fd;
+  border-left-color: #2196f3;
+}
+
+.session-item.session-partially_booked {
+  background-color: #fff3e0;
+  border-left-color: #ff9800;
+}
+
+.session-item.session-booked {
+  background-color: #ffebee;
+  border-left-color: #f44336;
+}
+
+.session-time {
+  font-weight: bold;
+  color: #1976d2;
+}
+
+.session-item.session-partially_booked .session-time {
+  color: #f57c00;
+}
+
+.session-item.session-booked .session-time {
+  color: #d32f2f;
+}
+
+.session-title {
+  font-size: 0.75rem;
+  color: #333;
+}
+
+.session-coach {
+  font-size: 0.7rem;
+  color: #666;
+}
+
+.session-status {
+  font-size: 0.6rem;
+  font-weight: bold;
+  color: #666;
+  text-align: center;
+  margin-top: 1px;
+}
+
+.session-item.session-partially_booked .session-status {
+  color: #f57c00;
+}
+
+.session-item.session-booked .session-status {
+  color: #d32f2f;
+}
+
+.more-sessions {
+  font-size: 0.7rem;
+  color: #666;
+  font-style: italic;
+}
+
+.calendar-week-grid {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.calendar-week-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-week-day {
+  min-height: 200px;
+  border-right: 1px solid #dee2e6;
+  padding: 10px;
+}
+
+.calendar-week-day:last-child {
+  border-right: none;
+}
+
+.calendar-day-sessions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.session-card {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #f8f9fa;
+}
+
+/* Session card availability status styles */
+.session-card.session-available {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+.session-card.session-partially_booked {
+  background-color: #fff8e1;
+  border-color: #ff9800;
+}
+
+.session-card.session-booked {
+  background-color: #ffebee;
+  border-color: #f44336;
+}
+
+.session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.session-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.session-price {
+  background-color: #28a745;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.session-status-badge {
+  background-color: #6c757d;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.session-card.session-partially_booked .session-status-badge {
+  background-color: #ff9800;
+}
+
+.session-card.session-booked .session-status-badge {
+  background-color: #f44336;
+}
+
+.session-details > div {
+  margin-bottom: 5px;
+}
+
+.no-sessions {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 40px;
+}

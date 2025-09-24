@@ -1,0 +1,24 @@
+# Node
+node_modules/
+client/node_modules/
+server/node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Build artifacts
+client/build/
+dist/
+*.log
+
+# Environment
+server/.env
+
+# SQLite DB (runtime data)
+server/coaching.db
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
