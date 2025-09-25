@@ -86,7 +86,12 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET &&
               'INSERT INTO users (email, name, role, google_id) VALUES (?, ?, ?, ?)',
               [newUser.email, newUser.name, newUser.role, newUser.google_id],
               function(err) {
-                if (err) return done(err);
+                if (err) {
+                  if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+                    return done(null, false, { message: 'Email already exists' });
+                  }
+                  return done(err);
+                }
                 newUser.id = this.lastID;
                 return done(null, newUser);
               }
@@ -226,6 +231,7 @@ app.post('/api/register', [
     [email, hashedPassword, name, role],
     function(err) {
       if (err) {
+        console.log('Registration error:', err.code, err.message);
         if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
           return res.status(400).json({ error: 'Email already exists' });
         }
