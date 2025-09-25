@@ -82,7 +82,7 @@ const Navbar = () => {
           {user ? (
             <>
               {/* Desktop Navigation - only show on desktop */}
-              {!isMobile && (
+              {!isMobile ? (
                 <div className="desktop-nav d-flex align-items-center gap-2">
                 <span style={{ color: 'white', marginRight: '1rem', fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap' }}>
                   Welcome, {user.name} ({user.role})
@@ -114,10 +114,7 @@ const Navbar = () => {
                   Logout
                 </button>
                 </div>
-              )}
-
-              {/* Mobile Navigation - only show on mobile */}
-              {isMobile && (
+              ) : (
               <div ref={mobileMenuRef} className="mobile-nav" style={{ position: 'relative', width: '100%' }}>
                 <div style={{ 
                   display: 'flex', 
@@ -210,6 +207,7 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
+              )}
             </>
           ) : (
             <div className="d-flex gap-2">
