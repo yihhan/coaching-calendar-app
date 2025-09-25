@@ -116,8 +116,8 @@ const StudentBooking = () => {
   };
 
   const isSessionFull = (session) => {
-    const confirmed = session.booked_count || 0;
-    return confirmed >= session.max_students;
+    const held = typeof session.held_count === 'number' ? session.held_count : (session.booked_count || 0);
+    return held >= session.max_students;
   };
 
   const isSessionBooked = (sessionId) => {
@@ -266,7 +266,7 @@ const StudentBooking = () => {
                       </div>
                       
                       <div className="mb-2">
-                        <strong>Spots:</strong> {session.booked_count || 0} / {session.max_students}
+                        <strong>Spots:</strong> {session.held_count || 0} / {session.max_students}
                       </div>
                       
                       <div className="mt-3">
