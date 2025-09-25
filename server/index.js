@@ -448,9 +448,9 @@ app.get('/api/profile', authenticateToken, (req, res) => {
 
 // Update profile (coach only for now)
 app.put('/api/profile', authenticateToken, [
-  body('name').optional().isString().trim().isLength({ min: 1 }),
-  body('description').optional().isString(),
-  body('expertise').optional()
+  body('name').optional().isString().trim().isLength({ min: 1, max: 100 }),
+  body('description').optional().isString().isLength({ max: 2000 }),
+  body('expertise').optional().isArray()
 ], (req, res) => {
 
   const errors = validationResult(req);
@@ -459,7 +459,7 @@ app.put('/api/profile', authenticateToken, [
   }
 
   const { name, description, expertise } = req.body;
-  if (!name && !description && typeof expertise === 'undefined') {
+  if ((!name || name === null) && (!description || description === null) && typeof expertise === 'undefined') {
     return res.status(400).json({ error: 'No changes provided' });
   }
 
@@ -469,7 +469,11 @@ app.put('/api/profile', authenticateToken, [
   if (typeof expertise !== 'undefined') {
     try {
       const list = Array.isArray(expertise) ? expertise : [];
-      expertiseJson = JSON.stringify(list);
+      // Validate expertise items are strings and not too long
+      const validList = list.filter(item => 
+        typeof item === 'string' && item.trim().length > 0 && item.length <= 50
+      );
+      expertiseJson = JSON.stringify(validList);
     } catch (_) {
       expertiseJson = JSON.stringify([]);
     }
@@ -477,9 +481,9 @@ app.put('/api/profile', authenticateToken, [
 
   const fields = [];
   const params = [];
-  if (typeof name !== 'undefined') { fields.push('name = ?'); params.push(name); }
-  if (isCoach && typeof description !== 'undefined') { fields.push('description = ?'); params.push(description); }
-  if (isCoach && typeof expertiseJson !== 'undefined') { fields.push('expertise = ?'); params.push(expertiseJson); }
+  if (typeof name !== 'undefined' && name !== null) { fields.push('name = ?'); params.push(name); }
+  if (isCoach && typeof description !== 'undefined' && description !== null) { fields.push('description = ?'); params.push(description); }
+  if (isCoach && typeof expertiseJson !== 'undefined' && expertiseJson !== null) { fields.push('expertise = ?'); params.push(expertiseJson); }
   params.push(req.user.id);
 
   db.run(
