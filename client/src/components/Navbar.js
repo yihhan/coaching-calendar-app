@@ -13,7 +13,9 @@ const Navbar = () => {
   // Mobile detection
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
+      const isMobileDevice = window.innerWidth <= 768;
+      console.log('Screen width:', window.innerWidth, 'Is mobile:', isMobileDevice);
+      setIsMobile(isMobileDevice);
     };
 
     checkMobile();
@@ -69,7 +71,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-primary" style={{ backgroundColor: '#3b82f6' }}>
       <div className="container">
         <div className="d-flex justify-content-between align-items-center">
           
