@@ -565,9 +565,15 @@ nav .btn {
   }
 }
 
-/* Calendar List View Styles */
-.calendar-list-view {
-  padding: 0;
+/* Disabled select options styling */
+.form-select option:disabled {
+  color: #9ca3af;
+  background-color: #f3f4f6;
+  font-style: italic;
+}
+
+.form-select option:disabled:hover {
+  background-color: #f3f4f6;
 }
 
 .date-group {

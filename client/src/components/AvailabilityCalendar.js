@@ -16,6 +16,23 @@ const AvailabilityCalendar = () => {
     }
     return 'month';
   }); // month, week, day, list
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // Handle window resize to update mobile state
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      
+      // If switching to mobile and current view is month/week, switch to list
+      if (mobile && (viewMode === 'month' || viewMode === 'week')) {
+        setViewMode('list');
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [viewMode]);
 
   const fetchCoaches = useCallback(async () => {
     try {
@@ -518,8 +535,8 @@ const AvailabilityCalendar = () => {
                       textAlign: 'left'
                     }}
                   >
-                    <option value="month">Month</option>
-                    <option value="week">Week</option>
+                    <option value="month" disabled={isMobile}>Month {isMobile ? '(Desktop Only)' : ''}</option>
+                    <option value="week" disabled={isMobile}>Week {isMobile ? '(Desktop Only)' : ''}</option>
                     <option value="day">Day</option>
                     <option value="list">List</option>
                   </select>
