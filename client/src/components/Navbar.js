@@ -103,30 +103,27 @@ const Navbar = () => {
               </div>
 
               {/* Mobile Navigation */}
-              <div ref={mobileMenuRef} className="mobile-nav" style={{ position: 'relative', width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+              <div ref={mobileMenuRef} className="mobile-nav" style={{ position: 'relative', width: '100%' }}>
                 <div style={{ 
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'space-between', 
                   width: '100%',
-                  maxWidth: '100%',
                   flexWrap: 'nowrap',
-                  gap: '2px',
-                  padding: '0 2px',
-                  boxSizing: 'border-box',
-                  overflow: 'hidden'
+                  gap: '8px',
+                  padding: '0 8px',
+                  boxSizing: 'border-box'
                 }}>
                   <span style={{ 
                     color: 'white', 
-                    fontSize: '10px', 
+                    fontSize: '12px', 
                     fontWeight: 600, 
                     flex: '1', 
                     minWidth: 0,
-                    marginRight: '2px',
+                    marginRight: '8px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    maxWidth: 'calc(100% - 30px)'
+                    whiteSpace: 'nowrap'
                   }}>
                     {user.name} ({user.role})
                   </span>
@@ -134,22 +131,21 @@ const Navbar = () => {
                     onClick={toggleMobileMenu}
                     className="btn"
                     style={{ 
-                      padding: '0.15rem 0.3rem', 
-                      fontSize: '10px', 
+                      padding: '0.4rem 0.6rem', 
+                      fontSize: '12px', 
                       flexShrink: 0,
                       minWidth: 'auto',
                       backgroundColor: '#ffffff',
                       color: '#3b82f6',
                       border: '1px solid #ffffff',
                       fontWeight: '600',
-                      borderRadius: '2px',
-                      maxWidth: '25px',
-                      width: '25px',
-                      height: '20px',
+                      borderRadius: '4px',
+                      minWidth: '40px',
+                      height: '32px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      overflow: 'hidden'
+                      cursor: 'pointer'
                     }}
                   >
                     {isMobileMenuOpen ? '✕' : '☰'}
