@@ -110,15 +110,16 @@ const Navbar = () => {
                   justifyContent: 'space-between', 
                   width: '100%',
                   flexWrap: 'nowrap',
-                  gap: '10px'
+                  gap: '5px',
+                  padding: '0 5px'
                 }}>
                   <span style={{ 
                     color: 'white', 
-                    fontSize: '12px', 
+                    fontSize: '11px', 
                     fontWeight: 600, 
                     flex: '1', 
                     minWidth: 0,
-                    marginRight: '10px',
+                    marginRight: '5px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap'
@@ -129,18 +130,19 @@ const Navbar = () => {
                     onClick={toggleMobileMenu}
                     className="btn"
                     style={{ 
-                      padding: '0.25rem 0.5rem', 
-                      fontSize: '12px', 
+                      padding: '0.2rem 0.4rem', 
+                      fontSize: '11px', 
                       flexShrink: 0,
                       minWidth: 'auto',
                       backgroundColor: '#ffffff',
                       color: '#3b82f6',
                       border: '1px solid #ffffff',
                       fontWeight: '600',
-                      borderRadius: '4px'
+                      borderRadius: '3px',
+                      maxWidth: '60px'
                     }}
                   >
-                    {isMobileMenuOpen ? '✕ Close' : '☰ Menu'}
+                    {isMobileMenuOpen ? '✕' : '☰'}
                   </button>
                 </div>
                 

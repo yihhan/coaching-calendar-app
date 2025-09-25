@@ -450,17 +450,31 @@ nav .btn {
   
   /* Navigation alignment fixes for horizontal mobile */
   nav {
-    padding: 0.5rem 0;
+    padding: 0.4rem 0;
     margin-bottom: 1rem;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
   }
   
   nav .container {
-    padding: 0 10px;
+    padding: 0 5px;
+    max-width: 100%;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  nav .d-flex {
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
   }
   
   /* Mobile navigation horizontal optimizations */
   .mobile-nav {
     width: 100%;
+    overflow: hidden;
   }
   
   .mobile-nav > div {
@@ -468,22 +482,27 @@ nav .btn {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0 5px;
+    box-sizing: border-box;
   }
   
   .mobile-nav span {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     flex: 1;
-    margin-right: 10px;
+    margin-right: 5px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    min-width: 0;
   }
   
   .mobile-nav button {
     flex-shrink: 0;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
+    padding: 0.2rem 0.4rem;
+    font-size: 0.7rem;
     min-width: auto;
+    max-width: 50px;
+    overflow: hidden;
   }
   
   .card {
@@ -514,12 +533,16 @@ nav .btn {
   
   .calendar-navigation {
     justify-content: flex-end;
-    gap: 5px;
+    gap: 3px;
+    flex-shrink: 0;
   }
   
   .calendar-navigation .btn {
-    padding: 5px 8px;
-    font-size: 0.8rem;
+    padding: 4px 6px;
+    font-size: 0.7rem;
+    min-width: auto;
+    max-width: 40px;
+    overflow: hidden;
   }
   
   /* Ensure calendar container aligns with navigation */
