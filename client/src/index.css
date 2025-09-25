@@ -440,8 +440,17 @@ nav .btn {
   }
 }
 
-/* Mobile Horizontal Orientation Optimizations */
-@media (max-width: 768px) and (orientation: landscape) {
+/* Mobile Optimizations - Both Portrait and Landscape */
+@media (max-width: 768px) {
+  /* Force hamburger menu on all mobile devices */
+  .desktop-nav.d-none.d-md-flex {
+    display: none !important;
+  }
+
+  .mobile-nav {
+    display: flex !important;
+  }
+
   /* Container and card optimizations for horizontal mobile */
   .container {
     max-width: 100%;
@@ -490,14 +499,6 @@ nav .btn {
     cursor: pointer;
   }
 
-  /* Force hamburger menu in mobile landscape mode - override Bootstrap classes */
-  .desktop-nav.d-none.d-md-flex {
-    display: none !important;
-  }
-
-  .mobile-nav {
-    display: flex !important;
-  }
   
   .card {
     max-width: 100%;
