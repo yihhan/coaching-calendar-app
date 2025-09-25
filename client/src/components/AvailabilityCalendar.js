@@ -10,9 +10,9 @@ const AvailabilityCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedCoach, setSelectedCoach] = useState('');
   const [viewMode, setViewMode] = useState(() => {
-    // Default to list view on mobile devices
+    // Default to list view on mobile devices in portrait, month in landscape
     if (window.innerWidth <= 768) {
-      return 'list';
+      return window.innerHeight > window.innerWidth ? 'list' : 'month';
     }
     return 'month';
   }); // month, week, day, list
@@ -22,11 +22,16 @@ const AvailabilityCalendar = () => {
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
+      const isLandscape = window.innerHeight < window.innerWidth;
       setIsMobile(mobile);
       
-      // If switching to mobile and current view is month/week, switch to list
-      if (mobile && (viewMode === 'month' || viewMode === 'week')) {
+      // If switching to mobile portrait and current view is month/week, switch to list
+      if (mobile && !isLandscape && (viewMode === 'month' || viewMode === 'week')) {
         setViewMode('list');
+      }
+      // If switching to mobile landscape and current view is list, switch to month
+      else if (mobile && isLandscape && viewMode === 'list') {
+        setViewMode('month');
       }
     };
 
@@ -535,8 +540,8 @@ const AvailabilityCalendar = () => {
                       textAlign: 'left'
                     }}
                   >
-                    <option value="month" disabled={isMobile}>Month {isMobile ? '(Desktop Only)' : ''}</option>
-                    <option value="week" disabled={isMobile}>Week {isMobile ? '(Desktop Only)' : ''}</option>
+                    <option value="month" disabled={isMobile && window.innerHeight > window.innerWidth}>Month {isMobile && window.innerHeight > window.innerWidth ? '(Desktop/Landscape Only)' : ''}</option>
+                    <option value="week" disabled={isMobile && window.innerHeight > window.innerWidth}>Week {isMobile && window.innerHeight > window.innerWidth ? '(Desktop/Landscape Only)' : ''}</option>
                     <option value="day">Day</option>
                     <option value="list">List</option>
                   </select>

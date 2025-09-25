@@ -438,6 +438,187 @@ nav .btn {
     font-size: 0.8rem;
     padding: 2px 6px;
   }
+}
+
+/* Mobile Horizontal Orientation Optimizations */
+@media (max-width: 768px) and (orientation: landscape) {
+  /* Container and card optimizations for horizontal mobile */
+  .container {
+    max-width: 100%;
+    padding: 0 5px;
+  }
+  
+  .card {
+    max-width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .card-body {
+    padding: 10px;
+  }
+  
+  /* Calendar header optimizations for horizontal */
+  .calendar-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .calendar-header h3 {
+    font-size: 1.1rem;
+    margin: 0;
+    flex: 1;
+    text-align: left;
+  }
+  
+  .calendar-navigation {
+    justify-content: flex-end;
+    gap: 5px;
+  }
+  
+  .calendar-navigation .btn {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+  }
+  
+  /* Month view horizontal optimizations */
+  .calendar-grid {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .calendar-weekdays {
+    font-size: 0.75rem;
+  }
+  
+  .calendar-weekday {
+    padding: 6px 2px;
+    font-size: 0.7rem;
+  }
+  
+  .calendar-day {
+    height: 100px;
+    max-height: 100px;
+    padding: 4px;
+    overflow: hidden;
+  }
+  
+  .day-number {
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+  }
+  
+  .day-sessions {
+    max-height: calc(100px - 20px);
+  }
+  
+  .session-item {
+    padding: 1px 2px;
+    margin-bottom: 1px;
+    max-height: 45px;
+    overflow: hidden;
+  }
+  
+  .session-time {
+    font-size: 0.6rem;
+  }
+  
+  .session-title {
+    font-size: 0.6rem;
+  }
+  
+  .session-coach {
+    font-size: 0.55rem;
+  }
+  
+  /* Week view horizontal optimizations */
+  .calendar-week-day {
+    height: 140px;
+    max-height: 140px;
+    padding: 6px;
+    overflow: hidden;
+  }
+  
+  .calendar-week-day .day-sessions {
+    max-height: calc(140px - 25px);
+  }
+  
+  /* Day view horizontal optimizations */
+  .calendar-day-view {
+    min-height: 200px;
+  }
+  
+  .session-card {
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .session-header h5 {
+    font-size: 0.9rem;
+  }
+  
+  .session-price {
+    font-size: 0.7rem;
+    padding: 2px 4px;
+  }
+  
+  /* List view horizontal optimizations */
+  .calendar-list-view {
+    padding: 0;
+  }
+  
+  .date-header {
+    padding: 0.5rem;
+  }
+  
+  .date-title {
+    font-size: 0.9rem;
+  }
+  
+  .sessions-list {
+    padding: 0.5rem;
+  }
+  
+  .sessions-list .session-card {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .sessions-list .session-title-truncated {
+    font-size: 0.85rem;
+  }
+  
+  .sessions-list .session-details {
+    font-size: 0.75rem;
+  }
+  
+  .sessions-list .session-price {
+    font-size: 0.7rem;
+  }
+  
+  /* Filter controls horizontal */
+  .row.g-3 {
+    margin-bottom: 10px;
+  }
+  
+  .col-md-4 {
+    margin-bottom: 5px;
+  }
+  
+  .form-label {
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+  }
+  
+  .form-select,
+  .form-control {
+    font-size: 0.8rem;
+    padding: 6px;
+    height: 32px;
+  }
+}
   
   /* Filter controls mobile */
   .row.mb-3 {
@@ -458,7 +639,6 @@ nav .btn {
     font-size: 0.9rem;
     padding: 8px;
   }
-}
 
 /* Extra small screens (phones in portrait) */
 @media (max-width: 480px) {
