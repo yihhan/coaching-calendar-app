@@ -57,7 +57,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-primary" style={{ backgroundColor: '#3b82f6' }}>
       <div className="container">
         <div className="d-flex justify-content-between align-items-center">
           
