@@ -1,17 +1,18 @@
 #!/usr/bin/env node
 
 /**
- * Debug Session Creation Test
- * This script tests session creation with detailed debugging
+ * Debug Production Session Creation
+ * Let's see what's actually happening with session creation
  */
 
 const https = require('https');
+const http = require('http');
 
 const PRODUCTION_URL = 'https://calla.sg';
 
 function makeRequest(url, options = {}) {
   return new Promise((resolve, reject) => {
-    const client = url.startsWith('https') ? https : require('http');
+    const client = url.startsWith('https') ? https : http;
     
     const requestOptions = {
       method: options.method || 'GET',
@@ -58,80 +59,101 @@ function makeRequest(url, options = {}) {
 }
 
 async function debugSessionCreation() {
-  console.log('🔍 Debugging Session Creation...');
+  console.log('🔍 Debugging Session Creation on Production...\n');
   
-  // First, let's register and login a coach
-  const coachEmail = `debugcoach${Date.now()}@example.com`;
-  const coachData = {
-    name: 'Debug Coach',
-    email: coachEmail,
-    password: 'testpass123',
-    role: 'coach'
-  };
-  
-  console.log('📝 Registering coach...');
+  // First, let's register a coach and get a token
+  console.log('1. Registering test coach...');
   const registerResponse = await makeRequest(`${PRODUCTION_URL}/api/register`, {
     method: 'POST',
-    body: coachData
-  });
-  
-  if (registerResponse.status !== 201) {
-    console.log('❌ Registration failed:', registerResponse.data);
-    return;
-  }
-  
-  console.log('🔑 Logging in coach...');
-  const loginResponse = await makeRequest(`${PRODUCTION_URL}/api/login`, {
-    method: 'POST',
     body: {
-      email: coachEmail,
-      password: 'testpass123'
+      name: 'Debug Coach',
+      email: `debugcoach${Date.now()}@example.com`,
+      password: 'testpass123',
+      role: 'coach'
     }
   });
   
-  if (loginResponse.status !== 200) {
-    console.log('❌ Login failed:', loginResponse.data);
+  console.log(`   Status: ${registerResponse.status}`);
+  console.log(`   Response: ${JSON.stringify(registerResponse.data, null, 2)}`);
+  
+  if (registerResponse.status !== 201) {
+    console.log('❌ Coach registration failed');
     return;
   }
   
-  const token = loginResponse.data.token;
-  console.log('✅ Coach logged in successfully');
+  const token = registerResponse.data.token;
+  console.log(`✅ Got token: ${token.substring(0, 20)}...\n`);
   
-  // Now test session creation with different formats
-  const startTime = new Date(Date.now() + 24 * 60 * 60 * 1000); // Tomorrow
-  const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour later
-  
-  console.log('📅 Start time:', startTime.toISOString());
-  console.log('📅 End time:', endTime.toISOString());
-  
-  const sessionData = {
-    title: 'Debug Test Session',
-    description: 'This is a debug test session',
-    start_time: startTime.toISOString(),
-    end_time: endTime.toISOString(),
-    max_students: 3,
-    price: 50,
-    repeat_interval: 'none',
-    occurrences: 1
-  };
-  
-  console.log('📤 Sending session data:', JSON.stringify(sessionData, null, 2));
-  
-  const response = await makeRequest(`${PRODUCTION_URL}/api/sessions`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`
+  // Now let's try different session creation formats
+  const testCases = [
+    {
+      name: 'Minimal valid data',
+      data: {
+        title: 'Test Session',
+        start_time: '2024-01-01T10:00:00.000Z',
+        end_time: '2024-01-01T11:00:00.000Z'
+      }
     },
-    body: sessionData
-  });
+    {
+      name: 'With all optional fields',
+      data: {
+        title: 'Test Session',
+        description: 'Test description',
+        start_time: '2024-01-01T10:00:00.000Z',
+        end_time: '2024-01-01T11:00:00.000Z',
+        max_students: 5,
+        price: 50
+      }
+    },
+    {
+      name: 'Future date',
+      data: {
+        title: 'Future Session',
+        start_time: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        end_time: new Date(Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000).toISOString()
+      }
+    }
+  ];
   
-  console.log('📥 Response status:', response.status);
-  console.log('📥 Response data:', JSON.stringify(response.data, null, 2));
+  for (const testCase of testCases) {
+    console.log(`\n2. Testing: ${testCase.name}`);
+    console.log(`   Data: ${JSON.stringify(testCase.data, null, 2)}`);
+    
+    const response = await makeRequest(`${PRODUCTION_URL}/api/sessions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: testCase.data
+    });
+    
+    console.log(`   Status: ${response.status}`);
+    console.log(`   Response: ${JSON.stringify(response.data, null, 2)}`);
+    
+    if (response.status === 201) {
+      console.log('✅ Session creation successful!');
+      break;
+    } else {
+      console.log('❌ Session creation failed');
+    }
+  }
   
-  if (response.status === 201) {
-    console.log('✅ Session creation successful!');
-  } else {
-    console.log('❌ Session creation failed');
+  // Let's also check what endpoints exist
+  console.log('\n3. Checking available endpoints...');
+  const endpoints = [
+    '/api/sessions',
+    '/api/sessions/coach',
+    '/api/sessions/available',
+    '/api/sessions/calendar'
+  ];
+  
+  for (const endpoint of endpoints) {
+    try {
+      const response = await makeRequest(`${PRODUCTION_URL}${endpoint}`);
+      console.log(`   ${endpoint}: ${response.status}`);
+    } catch (error) {
+      console.log(`   ${endpoint}: ERROR - ${error.message}`);
+    }
   }
 }
 

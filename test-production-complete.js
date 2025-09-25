@@ -212,8 +212,8 @@ async function testSessionCreation(token) {
   const sessionData = {
     title: 'Test Session',
     description: 'This is a test session created by automated testing',
-    start_time: startTime.toISOString(), // Full ISO8601 format
-    end_time: endTime.toISOString(), // Full ISO8601 format
+    start_time: startTime.toISOString().slice(0, 16), // YYYY-MM-DDTHH:mm format
+    end_time: endTime.toISOString().slice(0, 16), // YYYY-MM-DDTHH:mm format
     max_students: 3,
     price: 50,
     repeat_interval: 'none',
