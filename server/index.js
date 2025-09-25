@@ -116,7 +116,9 @@ passport.deserializeUser((id, done) => {
 });
 
 // Database setup
-const db = new sqlite3.Database('./coaching.db');
+const db = new sqlite3.Database(process.env.NODE_ENV === 'production' 
+  ? '/var/www/coaching-calendar-app/server/coaching.db' 
+  : './coaching.db');
 
 // Initialize database tables
 db.serialize(() => {
