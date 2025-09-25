@@ -116,8 +116,8 @@ const StudentBooking = () => {
   };
 
   const isSessionFull = (session) => {
-    const held = typeof session.held_count === 'number' ? session.held_count : (session.booked_count || 0);
-    return held >= session.max_students;
+    const confirmed = session.booked_count || 0;
+    return confirmed >= session.max_students;
   };
 
   const isSessionBooked = (sessionId) => {
