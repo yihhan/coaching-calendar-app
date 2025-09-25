@@ -491,7 +491,7 @@ nav .btn {
   }
 
   /* Force hamburger menu in mobile landscape mode */
-  nav .d-flex {
+  .desktop-nav {
     display: none !important;
   }
 
