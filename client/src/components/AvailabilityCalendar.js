@@ -290,7 +290,7 @@ const AvailabilityCalendar = () => {
     });
     
     return (
-      <div className="calendar-day">
+      <div className="calendar-day-view">
         <div className="calendar-header">
           <h3>{dayName}</h3>
           <div className="calendar-navigation">

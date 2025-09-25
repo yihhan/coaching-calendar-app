@@ -325,6 +325,10 @@ nav .btn {
   }
   
   /* Day view mobile */
+  .calendar-day-view {
+    min-height: 300px;
+  }
+  
   .session-card {
     padding: 10px;
   }
@@ -410,6 +414,11 @@ nav .btn {
   
   .card-header h2 {
     font-size: 1.3rem;
+  }
+  
+  /* Day view extra small screens */
+  .calendar-day-view {
+    min-height: 250px;
   }
 }
 
@@ -600,6 +609,11 @@ nav .btn {
 
 .calendar-week-day:last-child {
   border-right: none;
+}
+
+.calendar-day-view {
+  width: 100%;
+  min-height: 400px;
 }
 
 .calendar-day-sessions {
