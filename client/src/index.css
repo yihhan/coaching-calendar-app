@@ -760,3 +760,35 @@ nav .btn {
   overflow-wrap: break-word;
   hyphens: auto;
 }
+
+/* Handle unbreakable long strings */
+.card-body h4,
+.card-body h5,
+.session-title-truncated,
+.session-description-truncated,
+.session-description-expanded,
+.text-truncate,
+.text-truncate-multiline,
+.text-truncate-multiline-2,
+.text-truncate-multiline-1 {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+/* Specific handling for session titles in cards */
+.card-body h4.session-title-truncated {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
+
+/* Handle long strings in session items (calendar views) */
+.session-item .session-title,
+.session-item .session-coach {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  max-width: 100%;
+}
