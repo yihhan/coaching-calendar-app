@@ -136,14 +136,9 @@ db.serialize(() => {
   )`);
 
   // Ensure google_id/description/expertise columns exist (simple migration for older DBs)
-  db.get("PRAGMA table_info(users)", (err) => {
-    if (err) {
-      console.error('Error checking users table info:', err);
-      return;
-    }
-    db.all("PRAGMA table_info(users)", (err2, columns) => {
-      if (err2) {
-        console.error('Error reading users table info:', err2);
+  db.all("PRAGMA table_info(users)", (err, columns) => {
+      if (err) {
+        console.error('Error reading users table info:', err);
         return;
       }
       const has = (name) => Array.isArray(columns) && columns.some((c) => c.name === name);
