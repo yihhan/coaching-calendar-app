@@ -253,6 +253,17 @@ nav .btn {
     grid-template-columns: 1fr;
   }
   
+  /* Mobile container and card fixes */
+  .container {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
+  .card {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
   /* Mobile text wrapping for session cards */
   .card-body {
     word-wrap: break-word;
@@ -283,10 +294,12 @@ nav .btn {
   
   /* Mobile session title handling */
   .session-title-truncated {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    hyphens: auto;
-    white-space: normal;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+    white-space: normal !important;
+    text-overflow: unset !important;
+    overflow: visible !important;
     line-height: 1.3;
   }
   
@@ -485,6 +498,12 @@ nav .btn {
   .session-title-truncated {
     font-size: 0.95rem;
     line-height: 1.2;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+    white-space: normal !important;
+    text-overflow: unset !important;
+    overflow: visible !important;
   }
   
   /* Day view extra small screens */
@@ -831,6 +850,8 @@ nav .btn {
   white-space: nowrap;
   max-width: 100%;
   font-weight: bold;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .session-description-truncated {
