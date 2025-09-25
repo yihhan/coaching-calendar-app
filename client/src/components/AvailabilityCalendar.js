@@ -324,7 +324,7 @@ const AvailabilityCalendar = () => {
                     <strong>Time:</strong> {formatTime(session.start_time)} - {formatTime(session.end_time)}
                   </div>
                   <div className="session-coach">
-                    <strong>Coach:</strong> {session.coach_name}
+                    <strong>Coach:</strong> <span className="text-truncate" title={session.coach_name}>{session.coach_name}</span>
                   </div>
                   <div className="session-capacity">
                     <strong>Capacity:</strong> {session.max_students} students
@@ -392,12 +392,15 @@ const AvailabilityCalendar = () => {
                       fontSize: '14px',
                       backgroundColor: '#ffffff',
                       height: '42px',
-                      textAlign: 'left'
+                      textAlign: 'left',
+                      maxWidth: '100%',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
                     }}
                   >
                     <option value="">All Coaches</option>
                     {coaches.map(coach => (
-                      <option key={coach.id} value={coach.id}>{coach.name}</option>
+                      <option key={coach.id} value={coach.id} title={coach.name}>{coach.name}</option>
                     ))}
                   </select>
                 </div>

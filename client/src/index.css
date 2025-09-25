@@ -792,3 +792,65 @@ nav .btn {
   hyphens: auto;
   max-width: 100%;
 }
+
+/* Coach name truncation in calendar views */
+.session-coach {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Filter dropdown improvements for long coach names */
+.form-select option {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Ensure filter dropdowns can handle long names */
+select.form-select {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Calendar day view coach name handling */
+.calendar-day-sessions .session-coach {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+/* Calendar month view coach name handling */
+.calendar-day .session-coach {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Calendar week view coach name handling */
+.calendar-week-day .session-coach {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Responsive handling for very long coach names */
+@media (max-width: 768px) {
+  .session-coach {
+    font-size: 0.6rem;
+    max-width: 80px;
+  }
+  
+  .calendar-day-sessions .session-coach {
+    max-width: 120px;
+  }
+  
+  .form-select option {
+    font-size: 0.8rem;
+  }
+}

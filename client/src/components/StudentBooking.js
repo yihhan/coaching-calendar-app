@@ -176,7 +176,7 @@ const StudentBooking = () => {
                     >
                       <option value="">All Coaches</option>
                       {coaches.map(coach => (
-                        <option key={coach.id} value={coach.id}>
+                        <option key={coach.id} value={coach.id} title={coach.name}>
                           {coach.name}
                         </option>
                       ))}
