@@ -442,11 +442,12 @@ nav .btn {
 
 /* Mobile Optimizations - Both Portrait and Landscape */
 @media (max-width: 768px) {
-  /* Force hamburger menu on all mobile devices */
-  .desktop-nav.d-none.d-md-flex {
+  /* Hide desktop navigation on mobile */
+  .desktop-nav {
     display: none !important;
   }
 
+  /* Show mobile navigation on mobile */
   .mobile-nav {
     display: flex !important;
   }
