@@ -109,7 +109,8 @@ const Navbar = () => {
                   alignItems: 'center', 
                   justifyContent: 'space-between', 
                   width: '100%',
-                  flexWrap: 'nowrap'
+                  flexWrap: 'nowrap',
+                  gap: '10px'
                 }}>
                   <span style={{ 
                     color: 'white', 
@@ -117,7 +118,10 @@ const Navbar = () => {
                     fontWeight: 600, 
                     flex: '1', 
                     minWidth: 0,
-                    marginRight: '10px'
+                    marginRight: '10px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
                   }}>
                     Welcome, {user.name} ({user.role})
                   </span>
@@ -132,7 +136,8 @@ const Navbar = () => {
                       backgroundColor: '#ffffff',
                       color: '#3b82f6',
                       border: '1px solid #ffffff',
-                      fontWeight: '600'
+                      fontWeight: '600',
+                      borderRadius: '4px'
                     }}
                   >
                     {isMobileMenuOpen ? '✕ Close' : '☰ Menu'}

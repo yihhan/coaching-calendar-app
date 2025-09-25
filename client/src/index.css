@@ -445,7 +445,45 @@ nav .btn {
   /* Container and card optimizations for horizontal mobile */
   .container {
     max-width: 100%;
-    padding: 0 5px;
+    padding: 0 10px;
+  }
+  
+  /* Navigation alignment fixes for horizontal mobile */
+  nav {
+    padding: 0.5rem 0;
+    margin-bottom: 1rem;
+  }
+  
+  nav .container {
+    padding: 0 10px;
+  }
+  
+  /* Mobile navigation horizontal optimizations */
+  .mobile-nav {
+    width: 100%;
+  }
+  
+  .mobile-nav > div {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .mobile-nav span {
+    font-size: 0.8rem;
+    flex: 1;
+    margin-right: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .mobile-nav button {
+    flex-shrink: 0;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    min-width: auto;
   }
   
   .card {
@@ -464,6 +502,7 @@ nav .btn {
     align-items: center;
     gap: 10px;
     margin-bottom: 15px;
+    padding: 0 10px;
   }
   
   .calendar-header h3 {
@@ -481,6 +520,32 @@ nav .btn {
   .calendar-navigation .btn {
     padding: 5px 8px;
     font-size: 0.8rem;
+  }
+  
+  /* Ensure calendar container aligns with navigation */
+  .calendar-container {
+    padding: 0 10px;
+  }
+  
+  /* Main content alignment */
+  .card {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  .card-body {
+    padding: 10px;
+  }
+  
+  /* Filter section alignment */
+  .row.g-3 {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  .col-md-4 {
+    padding-left: 5px;
+    padding-right: 5px;
   }
   
   /* Month view horizontal optimizations */
