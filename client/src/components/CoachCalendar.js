@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import api from '../services/api';
+import TruncatedText from './TruncatedText';
 
 const CoachCalendar = () => {
   const [sessions, setSessions] = useState([]);
@@ -427,9 +428,16 @@ const CoachCalendar = () => {
               {sessions.map(session => (
                 <div key={session.id} className="card">
                   <div className="card-body">
-                    <h4>{session.title.toUpperCase()}</h4>
+                    <h4 className="session-title-truncated" title={session.title}>
+                      {session.title.toUpperCase()}
+                    </h4>
                     {session.description && (
-                      <p className="text-muted">{session.description}</p>
+                      <TruncatedText 
+                        text={session.description} 
+                        maxLines={2}
+                        truncateBy="lines"
+                        className="text-muted"
+                      />
                     )}
                     
                     <div className="mb-2">

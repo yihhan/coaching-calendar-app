@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import api from '../services/api';
+import TruncatedText from './TruncatedText';
 
 const AvailabilityCalendar = () => {
   const [sessions, setSessions] = useState([]);
@@ -192,8 +193,12 @@ const AvailabilityCalendar = () => {
                         {daySessions.slice(0, 3).map(session => (
                           <div key={session.id} className={`session-item session-${session.availability_status}`}>
                             <div className="session-time">{formatTime(session.start_time)}</div>
-                            <div className="session-title">{session.title.toUpperCase()}</div>
-                            <div className="session-coach">{session.coach_name}</div>
+                            <div className="session-title text-truncate" title={session.title}>
+                              {session.title.toUpperCase()}
+                            </div>
+                            <div className="session-coach text-truncate" title={session.coach_name}>
+                              {session.coach_name}
+                            </div>
                             {session.availability_status === 'booked' && (
                               <div className="session-status">FULL</div>
                             )}
@@ -250,8 +255,12 @@ const AvailabilityCalendar = () => {
                     {daySessions.map(session => (
                       <div key={session.id} className={`session-item session-${session.availability_status}`}>
                         <div className="session-time">{formatTime(session.start_time)}</div>
-                        <div className="session-title">{session.title.toUpperCase()}</div>
-                        <div className="session-coach">{session.coach_name}</div>
+                        <div className="session-title text-truncate" title={session.title}>
+                          {session.title.toUpperCase()}
+                        </div>
+                        <div className="session-coach text-truncate" title={session.coach_name}>
+                          {session.coach_name}
+                        </div>
                         <div className="session-price">${session.price}</div>
                         {session.availability_status === 'booked' && (
                           <div className="session-status">FULL</div>
@@ -297,7 +306,9 @@ const AvailabilityCalendar = () => {
             daySessions.map(session => (
               <div key={session.id} className={`session-card session-${session.availability_status}`}>
                 <div className="session-header">
-                  <h5>{session.title.toUpperCase()}</h5>
+                  <h5 className="session-title-truncated" title={session.title}>
+                    {session.title.toUpperCase()}
+                  </h5>
                   <div className="session-header-right">
                     <span className="session-price">${session.price}</span>
                     {session.availability_status === 'booked' && (
@@ -320,7 +331,13 @@ const AvailabilityCalendar = () => {
                   </div>
                   {session.description && (
                     <div className="session-description">
-                      <strong>Description:</strong> {session.description}
+                      <strong>Description:</strong> 
+                      <TruncatedText 
+                        text={session.description} 
+                        maxLines={2}
+                        truncateBy="lines"
+                        className="ml-1"
+                      />
                     </div>
                   )}
                 </div>
