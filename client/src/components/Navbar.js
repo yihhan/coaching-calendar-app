@@ -43,22 +43,21 @@ const Navbar = () => {
   };
 
   const getButtonStyle = (path) => {
-    const baseStyle = { marginRight: '0.5rem' };
-    if (isActive(path)) {
-      return {
-        ...baseStyle,
-        backgroundColor: '#1e40af', // darker blue for active state
-        border: '2px solid #ffffff',
-        fontWeight: 'bold'
-      };
-    }
-    return baseStyle;
+    return {
+      backgroundColor: isActive(path) ? '#3b82f6' : '#6b7280',
+      color: 'white',
+      border: 'none',
+      padding: '0.5rem 1rem',
+      borderRadius: '0.375rem',
+      textDecoration: 'none',
+      fontSize: '0.875rem',
+      fontWeight: '500'
+    };
   };
 
   const handleLogout = () => {
     logout();
     navigate('/login');
-    setIsMobileMenuOpen(false);
   };
 
   const toggleMobileMenu = () => {
@@ -70,143 +69,143 @@ const Navbar = () => {
   };
 
   return (
-    <nav style={{ 
-      backgroundColor: '#3b82f6', 
-      padding: '1rem 0',
-      marginBottom: '2rem',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-    }}>
+    <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
       <div className="container">
         <div className="d-flex justify-content-between align-items-center">
           
           {user ? (
             <>
               {/* Desktop Navigation - only show on desktop */}
-              {!isMobile ? (
+              {!isMobile && (
                 <div className="desktop-nav d-flex align-items-center gap-2">
-                <span style={{ color: 'white', marginRight: '1rem', fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                  Welcome, {user.name} ({user.role})
-                </span>
-                
-                <Link to="/dashboard" className="btn btn-secondary" style={getButtonStyle('/dashboard')}>
-                  Dashboard
-                </Link>
-                
-                <Link to="/availability" className="btn btn-secondary" style={getButtonStyle('/availability')}>
-                  Calendar
-                </Link>
-                
-                {user.role === 'coach' && (
-                  <Link to="/calendar" className="btn btn-secondary" style={getButtonStyle('/calendar')}>
-                    Sessions
-                  </Link>
-                )}
-                
-                {user.role === 'student' && (
-                  <Link to="/booking" className="btn btn-secondary" style={getButtonStyle('/booking')}>Book Sessions</Link>
-                )}
-                
-                <Link to="/profile" className="btn btn-secondary" style={getButtonStyle('/profile')}>
-                  Profile
-                </Link>
-                
-                <button onClick={handleLogout} className="btn btn-danger">
-                  Logout
-                </button>
-                </div>
-              ) : (
-              <div ref={mobileMenuRef} className="mobile-nav" style={{ position: 'relative', width: '100%' }}>
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'space-between', 
-                  width: '100%',
-                  flexWrap: 'nowrap',
-                  gap: '10px',
-                  padding: '0 10px',
-                  boxSizing: 'border-box'
-                }}>
-                  <span style={{ 
-                    color: 'white', 
-                    fontSize: '12px', 
-                    fontWeight: 600, 
-                    flex: '1', 
-                    minWidth: 0,
-                    marginRight: '10px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
-                  }}>
-                    {user.name} ({user.role})
+                  <span style={{ color: 'white', marginRight: '1rem', fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    Welcome, {user.name} ({user.role})
                   </span>
-                  <button 
-                    onClick={toggleMobileMenu}
-                    className="btn"
-                    style={{ 
-                      padding: '0.4rem 0.6rem', 
-                      fontSize: '12px', 
-                      flexShrink: 0,
-                      minWidth: '40px',
-                      backgroundColor: '#ffffff',
-                      color: '#3b82f6',
-                      border: '1px solid #ffffff',
-                      fontWeight: '600',
-                      borderRadius: '4px',
-                      height: '32px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {isMobileMenuOpen ? '✕' : '☰'}
+                  
+                  <Link to="/dashboard" className="btn btn-secondary" style={getButtonStyle('/dashboard')}>
+                    Dashboard
+                  </Link>
+                  
+                  <Link to="/availability" className="btn btn-secondary" style={getButtonStyle('/availability')}>
+                    Calendar
+                  </Link>
+                  
+                  {user.role === 'coach' && (
+                    <Link to="/calendar" className="btn btn-secondary" style={getButtonStyle('/calendar')}>
+                      Sessions
+                    </Link>
+                  )}
+                  
+                  {user.role === 'student' && (
+                    <Link to="/booking" className="btn btn-secondary" style={getButtonStyle('/booking')}>Book Sessions</Link>
+                  )}
+                  
+                  <Link to="/profile" className="btn btn-secondary" style={getButtonStyle('/profile')}>
+                    Profile
+                  </Link>
+                  
+                  <button onClick={handleLogout} className="btn btn-danger">
+                    Logout
                   </button>
                 </div>
-                
-                {isMobileMenuOpen && (
+              )}
+
+              {/* Mobile Navigation - only show on mobile */}
+              {isMobile && (
+                <div ref={mobileMenuRef} className="mobile-nav" style={{ position: 'relative', width: '100%' }}>
                   <div style={{ 
-                    position: 'absolute', 
-                    top: '100%', 
-                    left: '0', 
-                    right: '0', 
-                    backgroundColor: '#3b82f6', 
-                    padding: '1rem',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                    zIndex: 1000,
-                    borderTop: '1px solid rgba(255,255,255,0.2)'
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between', 
+                    width: '100%',
+                    flexWrap: 'nowrap',
+                    gap: '10px',
+                    padding: '0 10px',
+                    boxSizing: 'border-box'
                   }}>
-                    <div className="d-flex flex-column gap-2">
-                      <Link to="/dashboard" className="btn btn-secondary btn-sm" style={getButtonStyle('/dashboard')} onClick={closeMobileMenu}>
-                        Dashboard
-                      </Link>
-                      
-                      <Link to="/availability" className="btn btn-secondary btn-sm" style={getButtonStyle('/availability')} onClick={closeMobileMenu}>
-                        Calendar
-                      </Link>
-                      
-                      {user.role === 'coach' && (
-                        <Link to="/calendar" className="btn btn-secondary btn-sm" style={getButtonStyle('/calendar')} onClick={closeMobileMenu}>
-                          Sessions
-                        </Link>
-                      )}
-                      
-                      {user.role === 'student' && (
-                        <Link to="/booking" className="btn btn-secondary btn-sm" style={getButtonStyle('/booking')} onClick={closeMobileMenu}>
-                          Book Sessions
-                        </Link>
-                      )}
-                      
-                      <Link to="/profile" className="btn btn-secondary btn-sm" style={getButtonStyle('/profile')} onClick={closeMobileMenu}>
-                        Profile
-                      </Link>
-                      
-                      <button onClick={handleLogout} className="btn btn-danger btn-sm">
-                        Logout
-                      </button>
-                    </div>
+                    <span style={{ 
+                      color: 'white', 
+                      fontSize: '12px', 
+                      fontWeight: 600, 
+                      flex: '1',
+                      minWidth: 0,
+                      marginRight: '10px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      Welcome, {user.name} ({user.role})
+                    </span>
+                    
+                    <button
+                      onClick={toggleMobileMenu}
+                      className="btn"
+                      style={{
+                        padding: '0.4rem 0.6rem',
+                        fontSize: '12px',
+                        flexShrink: 0,
+                        minWidth: '40px',
+                        backgroundColor: '#ffffff',
+                        color: '#3b82f6',
+                        border: '1px solid #ffffff',
+                        fontWeight: '600',
+                        borderRadius: '4px',
+                        height: '32px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {isMobileMenuOpen ? '✕' : '☰'}
+                    </button>
                   </div>
-                )}
-              </div>
+                  
+                  {isMobileMenuOpen && (
+                    <div style={{ 
+                      position: 'absolute', 
+                      top: '100%', 
+                      left: '0', 
+                      right: '0', 
+                      backgroundColor: 'white', 
+                      border: '1px solid #e5e7eb', 
+                      borderRadius: '0.375rem', 
+                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', 
+                      zIndex: 1000,
+                      padding: '1rem'
+                    }}>
+                      <div className="d-flex flex-column gap-2">
+                        <Link to="/dashboard" className="btn btn-secondary btn-sm" style={getButtonStyle('/dashboard')} onClick={closeMobileMenu}>
+                          Dashboard
+                        </Link>
+                        
+                        <Link to="/availability" className="btn btn-secondary btn-sm" style={getButtonStyle('/availability')} onClick={closeMobileMenu}>
+                          Calendar
+                        </Link>
+                        
+                        {user.role === 'coach' && (
+                          <Link to="/calendar" className="btn btn-secondary btn-sm" style={getButtonStyle('/calendar')} onClick={closeMobileMenu}>
+                            Sessions
+                          </Link>
+                        )}
+                        
+                        {user.role === 'student' && (
+                          <Link to="/booking" className="btn btn-secondary btn-sm" style={getButtonStyle('/booking')} onClick={closeMobileMenu}>
+                            Book Sessions
+                          </Link>
+                        )}
+                        
+                        <Link to="/profile" className="btn btn-secondary btn-sm" style={getButtonStyle('/profile')} onClick={closeMobileMenu}>
+                          Profile
+                        </Link>
+                        
+                        <button onClick={handleLogout} className="btn btn-danger btn-sm">
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </>
           ) : (
