@@ -462,7 +462,7 @@ nav .btn {
   .mobile-nav {
     width: 100%;
   }
-  
+
   .mobile-nav > div {
     width: 100%;
     display: flex;
@@ -470,7 +470,7 @@ nav .btn {
     justify-content: space-between;
     padding: 0 10px;
   }
-  
+
   .mobile-nav span {
     font-size: 0.8rem;
     flex: 1;
@@ -480,7 +480,7 @@ nav .btn {
     white-space: nowrap;
     min-width: 0;
   }
-  
+
   .mobile-nav button {
     flex-shrink: 0;
     padding: 0.4rem 0.6rem;
@@ -488,6 +488,15 @@ nav .btn {
     min-width: 40px;
     height: 32px;
     cursor: pointer;
+  }
+
+  /* Force hamburger menu in mobile landscape mode */
+  nav .d-flex {
+    display: none !important;
+  }
+
+  .mobile-nav {
+    display: flex !important;
   }
   
   .card {
