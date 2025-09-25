@@ -452,32 +452,15 @@ nav .btn {
   nav {
     padding: 0.5rem 0;
     margin-bottom: 1rem;
-    overflow: hidden;
-    width: 100%;
-    box-sizing: border-box;
   }
   
   nav .container {
-    padding: 0 8px;
-    max-width: 100%;
-    overflow: hidden;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  nav .d-flex {
-    width: 100%;
-    overflow: hidden;
-    box-sizing: border-box;
-    max-width: 100%;
+    padding: 0 10px;
   }
   
   /* Mobile navigation horizontal optimizations */
   .mobile-nav {
     width: 100%;
-    overflow: hidden;
-    max-width: 100%;
-    box-sizing: border-box;
   }
   
   .mobile-nav > div {
@@ -485,16 +468,13 @@ nav .btn {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 8px;
-    box-sizing: border-box;
-    max-width: 100%;
-    overflow: hidden;
+    padding: 0 10px;
   }
   
   .mobile-nav span {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     flex: 1;
-    margin-right: 8px;
+    margin-right: 10px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -504,11 +484,9 @@ nav .btn {
   .mobile-nav button {
     flex-shrink: 0;
     padding: 0.4rem 0.6rem;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     min-width: 40px;
     height: 32px;
-    overflow: hidden;
-    box-sizing: border-box;
     cursor: pointer;
   }
   

@@ -110,8 +110,8 @@ const Navbar = () => {
                   justifyContent: 'space-between', 
                   width: '100%',
                   flexWrap: 'nowrap',
-                  gap: '8px',
-                  padding: '0 8px',
+                  gap: '10px',
+                  padding: '0 10px',
                   boxSizing: 'border-box'
                 }}>
                   <span style={{ 
@@ -120,7 +120,7 @@ const Navbar = () => {
                     fontWeight: 600, 
                     flex: '1', 
                     minWidth: 0,
-                    marginRight: '8px',
+                    marginRight: '10px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap'
@@ -134,13 +134,12 @@ const Navbar = () => {
                       padding: '0.4rem 0.6rem', 
                       fontSize: '12px', 
                       flexShrink: 0,
-                      minWidth: 'auto',
+                      minWidth: '40px',
                       backgroundColor: '#ffffff',
                       color: '#3b82f6',
                       border: '1px solid #ffffff',
                       fontWeight: '600',
                       borderRadius: '4px',
-                      minWidth: '40px',
                       height: '32px',
                       display: 'flex',
                       alignItems: 'center',
