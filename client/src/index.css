@@ -440,17 +440,8 @@ nav .btn {
   }
 }
 
-/* Mobile Optimizations - Both Portrait and Landscape */
+/* Mobile Optimizations */
 @media (max-width: 768px) {
-  /* Hide desktop navigation on mobile */
-  .desktop-nav {
-    display: none !important;
-  }
-
-  /* Show mobile navigation on mobile */
-  .mobile-nav {
-    display: flex !important;
-  }
 
   /* Container and card optimizations for horizontal mobile */
   .container {
