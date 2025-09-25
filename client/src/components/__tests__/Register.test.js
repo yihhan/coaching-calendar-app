@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import Register from '../Register';
 
 // Mock the AuthContext
-const mockRegister = jest.fn();
+const mockRegister = jest.fn(() => Promise.resolve({ success: true }));
 const mockUseAuth = {
   register: mockRegister,
   user: null,
@@ -117,14 +117,16 @@ describe('Register Component', () => {
     
     const nameInput = screen.getByLabelText('Full Name');
     const emailInput = screen.getByLabelText('Email');
+    const passwordInput = screen.getByLabelText('Password');
     const roleSelect = screen.getByLabelText('I am a');
     const submitButton = screen.getByRole('button', { name: 'Register' });
     
     fireEvent.change(nameInput, { target: { value: 'John Doe' } });
     fireEvent.change(emailInput, { target: { value: 'john@example.com' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
     fireEvent.change(roleSelect, { target: { value: 'coach' } });
     fireEvent.click(submitButton);
     
-    expect(mockRegister).toHaveBeenCalledWith('John Doe', 'john@example.com', 'coach');
+    expect(mockRegister).toHaveBeenCalledWith('john@example.com', 'password123', 'John Doe', 'coach');
   });
 });

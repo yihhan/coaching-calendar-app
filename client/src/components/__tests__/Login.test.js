@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import Login from '../Login';
 
 // Mock the AuthContext
-const mockLogin = jest.fn();
+const mockLogin = jest.fn(() => Promise.resolve({ success: true }));
 const mockUseAuth = {
   login: mockLogin,
   user: null,
