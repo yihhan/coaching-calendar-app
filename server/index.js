@@ -158,7 +158,6 @@ db.serialize(() => {
         });
       }
     });
-  });
 
   // Sessions table (coach availability)
   db.run(`CREATE TABLE IF NOT EXISTS sessions (
