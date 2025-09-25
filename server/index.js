@@ -87,7 +87,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET &&
               [newUser.email, newUser.name, newUser.role, newUser.google_id],
               function(err) {
                 if (err) {
-                  if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+                  if (err.code === 'SQLITE_CONSTRAINT' && err.message.includes('UNIQUE constraint failed: users.email')) {
                     return done(null, false, { message: 'Email already exists' });
                   }
                   return done(err);
@@ -231,8 +231,7 @@ app.post('/api/register', [
     [email, hashedPassword, name, role],
     function(err) {
       if (err) {
-        console.log('Registration error:', err.code, err.message);
-        if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+        if (err.code === 'SQLITE_CONSTRAINT' && err.message.includes('UNIQUE constraint failed: users.email')) {
           return res.status(400).json({ error: 'Email already exists' });
         }
         return res.status(500).json({ error: 'Database error' });
