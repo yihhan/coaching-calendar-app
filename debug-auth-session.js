@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Debug Session Creation Test
- * This script tests session creation with detailed debugging
+ * Debug Authentication Test
+ * This script tests authentication and session creation step by step
  */
 
 const https = require('https');
@@ -57,13 +57,13 @@ function makeRequest(url, options = {}) {
   });
 }
 
-async function debugSessionCreation() {
-  console.log('🔍 Debugging Session Creation...');
+async function debugAuthAndSession() {
+  console.log('🔍 Debugging Authentication and Session Creation...');
   
-  // First, let's register and login a coach
-  const coachEmail = `debugcoach${Date.now()}@example.com`;
+  // Register coach
+  const coachEmail = `authcoach${Date.now()}@example.com`;
   const coachData = {
-    name: 'Debug Coach',
+    name: 'Auth Coach',
     email: coachEmail,
     password: 'testpass123',
     role: 'coach'
@@ -75,11 +75,14 @@ async function debugSessionCreation() {
     body: coachData
   });
   
+  console.log('📥 Registration response:', registerResponse.status, registerResponse.data);
+  
   if (registerResponse.status !== 201) {
-    console.log('❌ Registration failed:', registerResponse.data);
+    console.log('❌ Registration failed');
     return;
   }
   
+  // Login coach
   console.log('🔑 Logging in coach...');
   const loginResponse = await makeRequest(`${PRODUCTION_URL}/api/login`, {
     method: 'POST',
@@ -89,50 +92,61 @@ async function debugSessionCreation() {
     }
   });
   
+  console.log('📥 Login response:', loginResponse.status, loginResponse.data);
+  
   if (loginResponse.status !== 200) {
-    console.log('❌ Login failed:', loginResponse.data);
+    console.log('❌ Login failed');
     return;
   }
   
   const token = loginResponse.data.token;
-  console.log('✅ Coach logged in successfully');
+  console.log('✅ Token received:', token.substring(0, 20) + '...');
   
-  // Now test session creation with different formats
-  const startTime = new Date(Date.now() + 24 * 60 * 60 * 1000); // Tomorrow
-  const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour later
+  // Test authentication with a simple request
+  console.log('🔐 Testing authentication...');
+  const authTestResponse = await makeRequest(`${PRODUCTION_URL}/api/profile`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
   
-  console.log('📅 Start time:', startTime.toISOString());
-  console.log('📅 End time:', endTime.toISOString());
+  console.log('📥 Auth test response:', authTestResponse.status, authTestResponse.data);
   
-  const sessionData = {
-    title: 'Debug Test Session',
-    description: 'This is a debug test session',
+  if (authTestResponse.status !== 200) {
+    console.log('❌ Authentication test failed');
+    return;
+  }
+  
+  console.log('✅ Authentication working!');
+  
+  // Now try session creation with minimal data
+  const startTime = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  const endTime = new Date(startTime.getTime() + 60 * 60 * 1000);
+  
+  const minimalSessionData = {
+    title: 'Minimal Test',
     start_time: startTime.toISOString(),
-    end_time: endTime.toISOString(),
-    max_students: 3,
-    price: 50,
-    repeat_interval: 'none',
-    occurrences: 1
+    end_time: endTime.toISOString()
   };
   
-  console.log('📤 Sending session data:', JSON.stringify(sessionData, null, 2));
+  console.log('📤 Sending minimal session data:', JSON.stringify(minimalSessionData, null, 2));
   
-  const response = await makeRequest(`${PRODUCTION_URL}/api/sessions`, {
+  const sessionResponse = await makeRequest(`${PRODUCTION_URL}/api/sessions`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`
     },
-    body: sessionData
+    body: minimalSessionData
   });
   
-  console.log('📥 Response status:', response.status);
-  console.log('📥 Response data:', JSON.stringify(response.data, null, 2));
+  console.log('📥 Session response:', sessionResponse.status, JSON.stringify(sessionResponse.data, null, 2));
   
-  if (response.status === 201) {
+  if (sessionResponse.status === 201) {
     console.log('✅ Session creation successful!');
   } else {
     console.log('❌ Session creation failed');
   }
 }
 
-debugSessionCreation().catch(console.error);
+debugAuthAndSession().catch(console.error);
