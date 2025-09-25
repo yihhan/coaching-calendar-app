@@ -9,7 +9,13 @@ const AvailabilityCalendar = () => {
   const [loading, setLoading] = useState(true);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedCoach, setSelectedCoach] = useState('');
-  const [viewMode, setViewMode] = useState('month'); // month, week, day
+  const [viewMode, setViewMode] = useState(() => {
+    // Default to list view on mobile devices
+    if (window.innerWidth <= 768) {
+      return 'list';
+    }
+    return 'month';
+  }); // month, week, day, list
 
   const fetchCoaches = useCallback(async () => {
     try {
@@ -158,6 +164,98 @@ const AvailabilityCalendar = () => {
     }
     
     return weekDates;
+  };
+
+  const renderListView = () => {
+    // Group sessions by date
+    const groupedSessions = sessions.reduce((groups, session) => {
+      const date = new Date(session.start_time).toDateString();
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(session);
+      return groups;
+    }, {});
+
+    // Sort dates
+    const sortedDates = Object.keys(groupedSessions).sort((a, b) => new Date(a) - new Date(b));
+
+    return (
+      <div className="calendar-list-view">
+        {sortedDates.length === 0 ? (
+          <div className="text-center">
+            <h3>No sessions available</h3>
+            <p className="text-muted">No sessions scheduled</p>
+          </div>
+        ) : (
+          sortedDates.map(date => (
+            <div key={date} className="date-group mb-4">
+              <div className="date-header">
+                <h4 className="date-title">{new Date(date).toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</h4>
+              </div>
+              
+              <div className="sessions-list">
+                {groupedSessions[date].map(session => (
+                  <div key={session.id} className={`session-card session-${session.availability_status} mb-3`}>
+                    <div className="session-header d-flex justify-content-between align-items-start">
+                      <h5 className="session-title-truncated" title={session.title}>
+                        {session.title.toUpperCase()}
+                      </h5>
+                      <span className={`session-price badge ${session.availability_status === 'booked' ? 'bg-danger' : session.availability_status === 'partially_booked' ? 'bg-warning' : 'bg-success'}`}>
+                        ${session.price}
+                      </span>
+                    </div>
+                    
+                    <div className="session-details">
+                      <div className="mb-2">
+                        <strong>Coach:</strong> {session.coach_name}
+                      </div>
+                      
+                      <div className="mb-2">
+                        <strong>Time:</strong> {formatTime(session.start_time)} - {formatTime(session.end_time)}
+                      </div>
+                      
+                      <div className="mb-2">
+                        <strong>Capacity:</strong> {session.booked_count || 0} / {session.max_students} students
+                      </div>
+                      
+                      {session.description && (
+                        <div className="session-description">
+                          <strong>Description:</strong> 
+                          <TruncatedText 
+                            text={session.description} 
+                            maxLines={2}
+                            truncateBy="lines"
+                            className="ml-1"
+                          />
+                        </div>
+                      )}
+                      
+                      <div className="session-status mt-2">
+                        {session.availability_status === 'booked' && (
+                          <span className="badge bg-danger">FULL</span>
+                        )}
+                        {session.availability_status === 'partially_booked' && (
+                          <span className="badge bg-warning">{session.booked_count}/{session.max_students}</span>
+                        )}
+                        {session.availability_status === 'available' && (
+                          <span className="badge bg-success">Available</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    );
   };
 
   const renderMonthView = () => {
@@ -423,6 +521,7 @@ const AvailabilityCalendar = () => {
                     <option value="month">Month</option>
                     <option value="week">Week</option>
                     <option value="day">Day</option>
+                    <option value="list">List</option>
                   </select>
                 </div>
                 <div className="col-md-4">
@@ -456,6 +555,7 @@ const AvailabilityCalendar = () => {
             {viewMode === 'month' && renderMonthView()}
             {viewMode === 'week' && renderWeekView()}
             {viewMode === 'day' && renderDayView()}
+            {viewMode === 'list' && renderListView()}
           </div>
         </div>
       </div>

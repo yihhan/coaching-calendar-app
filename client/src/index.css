@@ -565,9 +565,149 @@ nav .btn {
   }
 }
 
-/* Calendar Styles */
-.calendar-container {
-  margin-top: 20px;
+/* Calendar List View Styles */
+.calendar-list-view {
+  padding: 0;
+}
+
+.date-group {
+  margin-bottom: 2rem;
+}
+
+.date-header {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  padding: 1rem;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 0;
+}
+
+.date-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.sessions-list {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  padding: 1rem;
+}
+
+.sessions-list .session-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #f9fafb;
+  transition: all 0.2s ease;
+}
+
+.sessions-list .session-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.sessions-list .session-card:last-child {
+  margin-bottom: 0;
+}
+
+.sessions-list .session-header {
+  margin-bottom: 0.75rem;
+}
+
+.sessions-list .session-title-truncated {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.sessions-list .session-price {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.sessions-list .session-details {
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.sessions-list .session-details strong {
+  color: #374151;
+}
+
+.sessions-list .session-status {
+  margin-top: 0.5rem;
+}
+
+/* Mobile optimizations for list view */
+@media (max-width: 768px) {
+  .calendar-list-view {
+    padding: 0;
+  }
+  
+  .date-header {
+    padding: 0.75rem;
+  }
+  
+  .date-title {
+    font-size: 1rem;
+  }
+  
+  .sessions-list {
+    padding: 0.75rem;
+  }
+  
+  .sessions-list .session-card {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .sessions-list .session-title-truncated {
+    font-size: 0.95rem;
+  }
+  
+  .sessions-list .session-details {
+    font-size: 0.85rem;
+  }
+  
+  .sessions-list .session-price {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .date-header {
+    padding: 0.5rem;
+  }
+  
+  .date-title {
+    font-size: 0.9rem;
+  }
+  
+  .sessions-list {
+    padding: 0.5rem;
+  }
+  
+  .sessions-list .session-card {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .sessions-list .session-title-truncated {
+    font-size: 0.9rem;
+  }
+  
+  .sessions-list .session-details {
+    font-size: 0.8rem;
+  }
+  
+  .sessions-list .session-price {
+    font-size: 0.75rem;
+  }
 }
 
 .calendar-header {
