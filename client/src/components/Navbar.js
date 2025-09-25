@@ -210,7 +210,6 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
-              )}
             </>
           ) : (
             <div className="d-flex gap-2">
