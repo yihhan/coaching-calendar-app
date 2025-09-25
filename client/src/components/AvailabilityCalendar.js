@@ -190,7 +190,7 @@ const AvailabilityCalendar = () => {
                     <>
                       <div className="day-number">{day.getDate()}</div>
                       <div className="day-sessions">
-                        {daySessions.slice(0, 3).map(session => (
+                        {daySessions.map(session => (
                           <div key={session.id} className={`session-item session-${session.availability_status}`}>
                             <div className="session-time">{formatTime(session.start_time)}</div>
                             <div className="session-title text-truncate" title={session.title}>
@@ -207,9 +207,6 @@ const AvailabilityCalendar = () => {
                             )}
                           </div>
                         ))}
-                        {daySessions.length > 3 && (
-                          <div className="more-sessions">+{daySessions.length - 3} more</div>
-                        )}
                       </div>
                     </>
                   )}

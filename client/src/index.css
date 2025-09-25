@@ -293,6 +293,10 @@ nav .btn {
     margin-bottom: 2px;
   }
   
+  .day-sessions {
+    max-height: calc(80px - 25px); /* Subtract space for day number on mobile */
+  }
+  
   .session-item {
     padding: 1px 2px;
     margin-bottom: 1px;
@@ -379,6 +383,10 @@ nav .btn {
   
   .day-number {
     font-size: 0.8rem;
+  }
+  
+  .day-sessions {
+    max-height: calc(70px - 20px); /* Subtract space for day number on extra small screens */
   }
   
   .session-item {
@@ -500,6 +508,28 @@ nav .btn {
 
 .day-sessions {
   font-size: 0.8rem;
+  overflow-y: auto;
+  max-height: calc(120px - 30px); /* Subtract space for day number */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+.day-sessions::-webkit-scrollbar {
+  width: 4px;
+}
+
+.day-sessions::-webkit-scrollbar-track {
+  background: #f7fafc;
+  border-radius: 2px;
+}
+
+.day-sessions::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 2px;
+}
+
+.day-sessions::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
 }
 
 .session-item {
