@@ -14,7 +14,17 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({
+  limit: '10mb',
+  verify: (req, res, buf, encoding) => {
+    try {
+      JSON.parse(buf);
+    } catch (e) {
+      console.log('Invalid JSON received:', buf.toString());
+      throw new Error('Invalid JSON');
+    }
+  }
+}));
 
 // Session configuration
 app.use(session({
@@ -1032,6 +1042,17 @@ app.get('/api/coaches', (req, res) => {
       res.json(coaches);
     }
   );
+});
+
+// Global error handler
+app.use((error, req, res, next) => {
+  console.log('Error caught by global handler:', error.message);
+  
+  if (error instanceof SyntaxError && error.status === 400 && 'body' in error) {
+    return res.status(400).json({ error: 'Invalid JSON format' });
+  }
+  
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 app.listen(PORT, () => {
