@@ -490,8 +490,8 @@ nav .btn {
     cursor: pointer;
   }
 
-  /* Force hamburger menu in mobile landscape mode */
-  .desktop-nav {
+  /* Force hamburger menu in mobile landscape mode - override Bootstrap classes */
+  .desktop-nav.d-none.d-md-flex {
     display: none !important;
   }
 
