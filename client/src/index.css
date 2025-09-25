@@ -253,6 +253,43 @@ nav .btn {
     grid-template-columns: 1fr;
   }
   
+  /* Mobile text wrapping for session cards */
+  .card-body {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  .card-body h4,
+  .card-body h3,
+  .card-body h5 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.3;
+  }
+  
+  .card-body p {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  .card-body div {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  /* Mobile session title handling */
+  .session-title-truncated {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    white-space: normal;
+    line-height: 1.3;
+  }
+  
   .d-flex {
     flex-direction: column;
   }
@@ -422,6 +459,32 @@ nav .btn {
   
   .card-header h2 {
     font-size: 1.3rem;
+  }
+  
+  /* Extra small screens text wrapping */
+  .card-body {
+    padding: 10px;
+  }
+  
+  .card-body h4,
+  .card-body h3,
+  .card-body h5 {
+    font-size: 1rem;
+    line-height: 1.2;
+  }
+  
+  .card-body p {
+    font-size: 0.9rem;
+  }
+  
+  .card-body div {
+    font-size: 0.9rem;
+  }
+  
+  /* Extra small screens session title handling */
+  .session-title-truncated {
+    font-size: 0.95rem;
+    line-height: 1.2;
   }
   
   /* Day view extra small screens */
