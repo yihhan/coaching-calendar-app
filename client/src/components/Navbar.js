@@ -7,7 +7,19 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const mobileMenuRef = useRef(null);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Close mobile menu when clicking outside
   useEffect(() => {
@@ -69,8 +81,9 @@ const Navbar = () => {
           
           {user ? (
             <>
-              {/* Desktop Navigation */}
-              <div className="desktop-nav d-none d-md-flex align-items-center gap-2">
+              {/* Desktop Navigation - only show on desktop */}
+              {!isMobile && (
+                <div className="desktop-nav d-flex align-items-center gap-2">
                 <span style={{ color: 'white', marginRight: '1rem', fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap' }}>
                   Welcome, {user.name} ({user.role})
                 </span>
@@ -100,9 +113,11 @@ const Navbar = () => {
                 <button onClick={handleLogout} className="btn btn-danger">
                   Logout
                 </button>
-              </div>
+                </div>
+              )}
 
-              {/* Mobile Navigation */}
+              {/* Mobile Navigation - only show on mobile */}
+              {isMobile && (
               <div ref={mobileMenuRef} className="mobile-nav" style={{ position: 'relative', width: '100%' }}>
                 <div style={{ 
                   display: 'flex', 
@@ -195,6 +210,7 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
+              )}
             </>
           ) : (
             <div className="d-flex gap-2">
