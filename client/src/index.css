@@ -1481,48 +1481,67 @@ select.form-select {
   }
 }
 
-/* Date picker styling - change from red to blue */
+/* Date picker styling - change from red to blue - FORCE OVERRIDE */
 input[type="date"] {
-  accent-color: #3b82f6; /* Blue accent color for modern browsers */
+  accent-color: #3b82f6 !important; /* Blue accent color for modern browsers */
+  color-scheme: light !important;
 }
 
 /* Webkit-based browsers (Chrome, Safari, Edge) date picker styling */
 input[type="date"]::-webkit-calendar-picker-indicator {
-  color: #3b82f6;
-  background-color: #3b82f6;
-  border-radius: 3px;
-  cursor: pointer;
+  color: #3b82f6 !important;
+  background-color: #3b82f6 !important;
+  background-image: none !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+  filter: none !important;
+  width: 20px !important;
+  height: 20px !important;
 }
 
 input[type="date"]::-webkit-datetime-edit-fields-wrapper {
-  color: #1e40af;
+  color: #1e40af !important;
 }
 
 input[type="date"]::-webkit-datetime-edit-text {
-  color: #1e40af;
+  color: #1e40af !important;
 }
 
 input[type="date"]::-webkit-datetime-edit-month-field,
 input[type="date"]::-webkit-datetime-edit-day-field,
 input[type="date"]::-webkit-datetime-edit-year-field {
-  color: #1e40af;
+  color: #1e40af !important;
 }
 
 input[type="date"]:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25) !important;
 }
 
-/* Mobile-specific date picker styling */
+/* Mobile-specific date picker styling - FORCE OVERRIDE */
 @media (max-width: 768px) {
   input[type="date"] {
-    accent-color: #3b82f6;
-    border-color: #3b82f6;
+    accent-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    color-scheme: light !important;
   }
   
   input[type="date"]::-webkit-calendar-picker-indicator {
-    background-color: #3b82f6;
-    color: #ffffff;
-    padding: 2px;
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+    padding: 2px !important;
+    background-image: none !important;
+    filter: invert(0) !important;
   }
+}
+
+/* Additional override for stubborn browsers */
+.form-control[type="date"] {
+  accent-color: #3b82f6 !important;
+}
+
+.form-control[type="date"]::-webkit-calendar-picker-indicator {
+  background-color: #3b82f6 !important;
+  color: #3b82f6 !important;
+  background-image: none !important;
 }
