@@ -31,10 +31,11 @@ const Navbar = () => {
   };
 
   const getButtonStyle = (path) => {
+    const active = isActive(path);
     return {
-      backgroundColor: isActive(path) ? '#1e40af' : '#6b7280',
+      backgroundColor: active ? '#1e40af' : '#3b82f6', // active: darker blue, inactive: same as navbar blue
       color: 'white',
-      border: 'none',
+      border: active ? 'none' : '1px solid rgba(255,255,255,0.35)',
       padding: '0.5rem 1rem',
       borderRadius: '0.375rem',
       textDecoration: 'none',
@@ -65,9 +66,6 @@ const Navbar = () => {
             <>
               {/* Desktop Navigation */}
               <div className="d-none d-md-flex align-items-center gap-2">
-                <span style={{ color: 'white', marginRight: '1rem', fontSize: '14px', fontWeight: 600 }}>
-                  Welcome, {user.name} ({user.role})
-                </span>
                 
                 <Link to="/dashboard" className="btn btn-secondary" style={getButtonStyle('/dashboard')}>
                   Dashboard
@@ -101,18 +99,10 @@ const Navbar = () => {
                 <div style={{ 
                   display: 'flex', 
                   alignItems: 'center', 
-                  justifyContent: 'space-between', 
+                  justifyContent: 'flex-end', 
                   width: '100%'
                 }}>
-                  <span style={{ 
-                    color: 'white', 
-                    fontSize: '14px', 
-                    fontWeight: 600,
-                    flex: 1,
-                    marginRight: '1rem'
-                  }}>
-                    Welcome, {user.name} ({user.role})
-                  </span>
+                  
                   
                   <button
                     onClick={toggleMobileMenu}
@@ -141,27 +131,27 @@ const Navbar = () => {
                     padding: '1rem'
                   }}>
                     <div className="d-flex flex-column gap-2">
-                      <Link to="/dashboard" className="btn btn-secondary btn-sm" style={getButtonStyle('/dashboard')} onClick={closeMobileMenu}>
+                      <Link to="/dashboard" className="btn btn-sm w-100" style={{ ...getButtonStyle('/dashboard'), width: '100%' }} onClick={closeMobileMenu}>
                         Dashboard
                       </Link>
                       
-                      <Link to="/availability" className="btn btn-secondary btn-sm" style={getButtonStyle('/availability')} onClick={closeMobileMenu}>
+                      <Link to="/availability" className="btn btn-sm w-100" style={{ ...getButtonStyle('/availability'), width: '100%' }} onClick={closeMobileMenu}>
                         Calendar
                       </Link>
                       
                       {user.role === 'coach' && (
-                        <Link to="/calendar" className="btn btn-secondary btn-sm" style={getButtonStyle('/calendar')} onClick={closeMobileMenu}>
+                        <Link to="/calendar" className="btn btn-sm w-100" style={{ ...getButtonStyle('/calendar'), width: '100%' }} onClick={closeMobileMenu}>
                           Sessions
                         </Link>
                       )}
                       
                       {user.role === 'student' && (
-                        <Link to="/booking" className="btn btn-secondary btn-sm" style={getButtonStyle('/booking')} onClick={closeMobileMenu}>
+                        <Link to="/booking" className="btn btn-sm w-100" style={{ ...getButtonStyle('/booking'), width: '100%' }} onClick={closeMobileMenu}>
                           Book Sessions
                         </Link>
                       )}
                       
-                      <Link to="/profile" className="btn btn-secondary btn-sm" style={getButtonStyle('/profile')} onClick={closeMobileMenu}>
+                      <Link to="/profile" className="btn btn-sm w-100" style={{ ...getButtonStyle('/profile'), width: '100%' }} onClick={closeMobileMenu}>
                         Profile
                       </Link>
                       
@@ -174,7 +164,7 @@ const Navbar = () => {
               </div>
             </>
           ) : (
-            <div className="d-flex gap-2">
+            <div className="d-flex gap-2 align-items-center">
               <Link to="/login" className="btn btn-secondary">
                 Login
               </Link>

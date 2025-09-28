@@ -7,6 +7,7 @@ const { body, validationResult } = require('express-validator');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const app = express();
@@ -125,6 +126,101 @@ const db = new sqlite3.Database(process.env.NODE_ENV === 'production'
   ? '/var/www/coaching-calendar-app/server/coaching.db' 
   : './coaching.db');
 
+// Email service setup
+const emailTransporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER || 'your-email@gmail.com',
+    pass: process.env.EMAIL_PASS || 'your-app-password'
+  }
+});
+
+// Email notification function
+const sendBookingNotification = async (coachEmail, coachName, studentName, sessionTitle, sessionDate, sessionTime) => {
+  try {
+    const safeStudentName = studentName || 'Student';
+    const mailOptions = {
+      from: process.env.EMAIL_USER || 'your-email@gmail.com',
+      to: coachEmail,
+      subject: `New Booking Request - ${sessionTitle}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #3b82f6;">New Booking Request</h2>
+          <p>Hi ${coachName},</p>
+          <p>You have received a new booking request from <strong>${safeStudentName}</strong>:</p>
+          
+          <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #1e40af;">${sessionTitle}</h3>
+            <p><strong>Date:</strong> ${sessionDate}</p>
+            <p><strong>Time:</strong> ${sessionTime}</p>
+            <p><strong>Student:</strong> ${safeStudentName}</p>
+          </div>
+          
+          <p>Please log in to your dashboard to confirm or decline this booking.</p>
+          
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <p style="color: #6b7280; font-size: 14px;">
+              This is an automated notification from Calla - Just a good teacher away
+            </p>
+          </div>
+        </div>
+      `
+    };
+
+    const result = await emailTransporter.sendMail(mailOptions);
+    console.log(`📧 Booking notification sent to ${coachEmail}:`, result.messageId);
+    return result;
+  } catch (error) {
+    console.error('❌ Failed to send booking notification:', error);
+    throw error;
+  }
+};
+
+// Email notification to student upon coach decision
+const sendStudentDecisionNotification = async (studentEmail, studentName, coachName, sessionTitle, sessionDate, sessionTime, decision) => {
+  try {
+    const safeStudentName = studentName || 'Student';
+    const prettyDecision = (decision === 'approved') ? 'Approved' : 'Rejected';
+    const subject = `Booking ${prettyDecision} - ${sessionTitle}`;
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER || 'your-email@gmail.com',
+      to: studentEmail,
+      subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: ${decision === 'approved' ? '#10b981' : '#ef4444'};">Booking ${prettyDecision}</h2>
+          <p>Hi ${safeStudentName},</p>
+          <p>Your booking has been <strong>${prettyDecision.toLowerCase()}</strong> by <strong>${coachName}</strong>.</p>
+
+          <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #1e40af;">${sessionTitle}</h3>
+            <p><strong>Date:</strong> ${sessionDate}</p>
+            <p><strong>Time:</strong> ${sessionTime}</p>
+            <p><strong>Coach:</strong> ${coachName}</p>
+            <p><strong>Status:</strong> ${prettyDecision}</p>
+          </div>
+
+          <p>Please log in to your dashboard for details.</p>
+
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <p style="color: #6b7280; font-size: 14px;">
+              This is an automated notification from Calla - Just a good teacher away
+            </p>
+          </div>
+        </div>
+      `
+    };
+
+    const result = await emailTransporter.sendMail(mailOptions);
+    console.log(`📧 Student ${prettyDecision} notification sent to ${studentEmail}:`, result.messageId);
+    return result;
+  } catch (error) {
+    console.error('❌ Failed to send student decision notification:', error);
+    throw error;
+  }
+};
+
 // Initialize database tables
 db.serialize(() => {
   // Users table (coaches and students)
@@ -189,6 +285,22 @@ db.serialize(() => {
     FOREIGN KEY (session_id) REFERENCES sessions (id),
     FOREIGN KEY (student_id) REFERENCES users (id)
   )`);
+
+  // Credits table for coaches
+  db.run(`CREATE TABLE IF NOT EXISTS credits (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    coach_id INTEGER NOT NULL UNIQUE,
+    balance DECIMAL(10,2) DEFAULT 100.00,
+    last_deduction_date DATE DEFAULT CURRENT_DATE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (coach_id) REFERENCES users (id)
+  )`, (err) => {
+    if (err) {
+      console.error('Error creating credits table:', err);
+    } else {
+      console.log('✅ Credits table ready');
+    }
+  });
 });
 
 // Authentication middleware
@@ -740,7 +852,22 @@ app.get('/api/sessions/available', (req, res) => {
 
 // Get all sessions for availability calendar (shows both available and booked)
 app.get('/api/sessions/calendar', (req, res) => {
-  const { coach_id, start_date, end_date } = req.query;
+  const { start_date, end_date } = req.query;
+  let coach_id = req.query.coach_id;
+
+  // If a valid JWT is provided and the user is a coach, force-filter to their own sessions
+  const authHeader = req.headers['authorization'];
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    try {
+      const token = authHeader.split(' ')[1];
+      const payload = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+      if (payload && payload.role === 'coach') {
+        coach_id = String(payload.id);
+      }
+    } catch (_) {
+      // Ignore invalid tokens; treat as public request
+    }
+  }
   
   let query = `
     SELECT 
@@ -833,6 +960,36 @@ app.put('/api/bookings/:id/approve', authenticateToken, (req, res) => {
                 return res.status(500).json({ error: 'Database error' });
               }
 
+              // Notify student (non-blocking)
+              db.get(
+                `SELECT s.title, s.start_time, u.name as coach_name, u2.name as student_name, u2.email as student_email
+                 FROM bookings b
+                 JOIN sessions s ON b.session_id = s.id
+                 JOIN users u ON s.coach_id = u.id
+                 JOIN users u2 ON b.student_id = u2.id
+                 WHERE b.id = ?`,
+                [bookingId],
+                async (infoErr, info) => {
+                  if (!infoErr && info) {
+                    try {
+                      const sessionDate = new Date(info.start_time).toLocaleDateString();
+                      const sessionTime = new Date(info.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                      await sendStudentDecisionNotification(
+                        info.student_email,
+                        info.student_name,
+                        info.coach_name,
+                        info.title,
+                        sessionDate,
+                        sessionTime,
+                        'approved'
+                      );
+                    } catch (notifyErr) {
+                      console.error('Failed sending approve email to student:', notifyErr);
+                    }
+                  }
+                }
+              );
+
               res.json({
                 message: 'Booking approved successfully',
                 booking: { id: bookingId, status: 'confirmed' }
@@ -878,6 +1035,36 @@ app.put('/api/bookings/:id/reject', authenticateToken, (req, res) => {
           if (err) {
             return res.status(500).json({ error: 'Database error' });
           }
+
+          // Notify student (non-blocking)
+          db.get(
+            `SELECT s.title, s.start_time, u.name as coach_name, u2.name as student_name, u2.email as student_email
+             FROM bookings b
+             JOIN sessions s ON b.session_id = s.id
+             JOIN users u ON s.coach_id = u.id
+             JOIN users u2 ON b.student_id = u2.id
+             WHERE b.id = ?`,
+            [bookingId],
+            async (infoErr, info) => {
+              if (!infoErr && info) {
+                try {
+                  const sessionDate = new Date(info.start_time).toLocaleDateString();
+                  const sessionTime = new Date(info.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                  await sendStudentDecisionNotification(
+                    info.student_email,
+                    info.student_name,
+                    info.coach_name,
+                    info.title,
+                    sessionDate,
+                    sessionTime,
+                    'rejected'
+                  );
+                } catch (notifyErr) {
+                  console.error('Failed sending reject email to student:', notifyErr);
+                }
+              }
+            }
+          );
 
           res.json({
             message: 'Booking rejected successfully',
@@ -977,6 +1164,45 @@ app.post('/api/bookings', authenticateToken, [
                     return res.status(500).json({ error: 'Database error' });
                   }
 
+                  // Send email notification to coach
+                  db.get(
+                    'SELECT u.email, u.name as coach_name FROM users u JOIN sessions s ON u.id = s.coach_id WHERE s.id = ?',
+                    [session_id],
+                    async (err, coach) => {
+                      if (err) {
+                        console.error('Error fetching coach info for email:', err);
+                      } else if (coach) {
+                        // Fetch student's display name for email (fallback to email)
+                        db.get(
+                          'SELECT name, email FROM users WHERE id = ?',
+                          [req.user.id],
+                          async (studentErr, student) => {
+                            const studentDisplayName = (student && student.name)
+                              ? student.name
+                              : (student && student.email)
+                                ? student.email
+                                : 'Student';
+
+                            try {
+                              const sessionDate = new Date(session.start_time).toLocaleDateString();
+                              const sessionTime = new Date(session.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                              await sendBookingNotification(
+                                coach.email,
+                                coach.coach_name,
+                                studentDisplayName,
+                                session.title,
+                                sessionDate,
+                                sessionTime
+                              );
+                            } catch (emailError) {
+                              console.error('Failed to send booking notification email:', emailError);
+                            }
+                          }
+                        );
+                      }
+                    }
+                  );
+
                   res.status(201).json({
                     message: 'Booking request submitted. Waiting for coach approval.',
                     booking: { id: this.lastID, session_id, student_id: req.user.id, status: 'pending' }
@@ -1047,6 +1273,139 @@ app.get('/api/coaches', (req, res) => {
       res.json(coaches);
     }
   );
+});
+
+// Credit management functions
+const initializeCoachCredits = (coachId) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      'INSERT OR IGNORE INTO credits (coach_id, balance, last_deduction_date) VALUES (?, 100.00, CURRENT_DATE)',
+      [coachId],
+      function(err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(this.lastID);
+        }
+      }
+    );
+  });
+};
+
+const processDailyCreditDeductions = () => {
+  return new Promise((resolve, reject) => {
+    db.all(
+      `SELECT coach_id, balance, last_deduction_date 
+       FROM credits 
+       WHERE last_deduction_date < CURRENT_DATE`,
+      (err, credits) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const updates = credits.map(credit => {
+          const daysSinceLastDeduction = Math.floor(
+            (new Date() - new Date(credit.last_deduction_date)) / (1000 * 60 * 60 * 24)
+          );
+          const newBalance = Math.max(0, credit.balance - daysSinceLastDeduction);
+          
+          return new Promise((resolveUpdate, rejectUpdate) => {
+            db.run(
+              'UPDATE credits SET balance = ?, last_deduction_date = CURRENT_DATE WHERE coach_id = ?',
+              [newBalance, credit.coach_id],
+              function(updateErr) {
+                if (updateErr) {
+                  rejectUpdate(updateErr);
+                } else {
+                  resolveUpdate();
+                }
+              }
+            );
+          });
+        });
+
+        Promise.all(updates)
+          .then(() => resolve())
+          .catch(reject);
+      }
+    );
+  });
+};
+
+// Get coach credits
+app.get('/api/credits', authenticateToken, (req, res) => {
+  if (req.user.role !== 'coach') {
+    return res.status(403).json({ error: 'Only coaches can access credits' });
+  }
+
+  console.log(`📊 Fetching credits for coach ID: ${req.user.id}`);
+
+  db.get(
+    'SELECT balance, last_deduction_date FROM credits WHERE coach_id = ?',
+    [req.user.id],
+    async (err, credit) => {
+      if (err) {
+        console.error('Database error fetching credits:', err);
+        return res.status(500).json({ error: 'Database error' });
+      }
+
+      // If no credit record exists, create one
+      if (!credit) {
+        console.log(`💰 No credits found for coach ${req.user.id}, initializing...`);
+        try {
+          await initializeCoachCredits(req.user.id);
+          credit = { balance: 100.00, last_deduction_date: new Date().toISOString().split('T')[0] };
+          console.log(`✅ Credits initialized for coach ${req.user.id}`);
+        } catch (initErr) {
+          console.error('Failed to initialize credits:', initErr);
+          return res.status(500).json({ error: 'Failed to initialize credits' });
+        }
+      }
+
+      // Process daily deductions before returning
+      try {
+        await processDailyCreditDeductions();
+        
+        // Get updated balance
+        db.get(
+          'SELECT balance, last_deduction_date FROM credits WHERE coach_id = ?',
+          [req.user.id],
+          (finalErr, finalCredit) => {
+            if (finalErr) {
+              return res.status(500).json({ error: 'Database error' });
+            }
+            res.json(finalCredit);
+          }
+        );
+      } catch (deductionErr) {
+        return res.status(500).json({ error: 'Failed to process credit deductions' });
+      }
+    }
+  );
+});
+
+// Initialize credits for existing coaches (admin function)
+app.post('/api/credits/initialize-all', authenticateToken, (req, res) => {
+  if (req.user.role !== 'coach') {
+    return res.status(403).json({ error: 'Only coaches can access this endpoint' });
+  }
+
+  db.all('SELECT id FROM users WHERE role = "coach"', (err, coaches) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    const initPromises = coaches.map(coach => initializeCoachCredits(coach.id));
+    
+    Promise.all(initPromises)
+      .then(() => {
+        res.json({ message: `Initialized credits for ${coaches.length} coaches` });
+      })
+      .catch(initErr => {
+        res.status(500).json({ error: 'Failed to initialize some credits' });
+      });
+  });
 });
 
 // Global error handler

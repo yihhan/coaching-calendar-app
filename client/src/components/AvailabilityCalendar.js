@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 import TruncatedText from './TruncatedText';
+import { useAuth } from '../contexts/AuthContext';
 
 const AvailabilityCalendar = () => {
+  const { user } = useAuth();
   const [sessions, setSessions] = useState([]);
   const [coaches, setCoaches] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +40,14 @@ const AvailabilityCalendar = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [viewMode]);
+
+  // If a coach is logged in, lock the calendar to their sessions only
+  useEffect(() => {
+    if (user && user.role === 'coach') {
+      // Ensure selectedCoach is set to the logged-in coach id
+      setSelectedCoach(String(user.id));
+    }
+  }, [user]);
 
   const fetchCoaches = useCallback(async () => {
     try {
@@ -493,34 +503,36 @@ const AvailabilityCalendar = () => {
                 Filter Options
               </h5>
               <div className="row g-3 align-items-end">
-                <div className="col-md-4">
-                  <label htmlFor="coachFilter" className="form-label fw-semibold mb-2" style={{ color: '#475569' }}>
-                    Coach
-                  </label>
-                  <select 
-                    id="coachFilter"
-                    className="form-select" 
-                    value={selectedCoach} 
-                    onChange={(e) => setSelectedCoach(e.target.value)}
-                    style={{ 
-                      border: '1px solid #d1d5db', 
-                      borderRadius: '8px',
-                      padding: '10px 12px',
-                      fontSize: '14px',
-                      backgroundColor: '#ffffff',
-                      height: '42px',
-                      textAlign: 'left',
-                      maxWidth: '100%',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
-                    }}
-                  >
-                    <option value="">All Coaches</option>
-                    {coaches.map(coach => (
-                      <option key={coach.id} value={coach.id} title={coach.name}>{coach.name}</option>
-                    ))}
-                  </select>
-                </div>
+                {!(user && user.role === 'coach') && (
+                  <div className="col-md-4">
+                    <label htmlFor="coachFilter" className="form-label fw-semibold mb-2" style={{ color: '#475569' }}>
+                      Coach
+                    </label>
+                    <select 
+                      id="coachFilter"
+                      className="form-select" 
+                      value={selectedCoach} 
+                      onChange={(e) => setSelectedCoach(e.target.value)}
+                      style={{ 
+                        border: '1px solid #d1d5db', 
+                        borderRadius: '8px',
+                        padding: '10px 12px',
+                        fontSize: '14px',
+                        backgroundColor: '#ffffff',
+                        height: '42px',
+                        textAlign: 'left',
+                        maxWidth: '100%',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}
+                    >
+                      <option value="">All Coaches</option>
+                      {coaches.map(coach => (
+                        <option key={coach.id} value={coach.id} title={coach.name}>{coach.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 <div className="col-md-4">
                   <label htmlFor="viewMode" className="form-label fw-semibold mb-2" style={{ color: '#475569' }}>
                     View Mode

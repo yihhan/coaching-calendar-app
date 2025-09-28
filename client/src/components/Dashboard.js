@@ -1,8 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import api from '../services/api';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const [credits, setCredits] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user && user.role === 'coach') {
+      fetchCredits();
+    }
+  }, [user]);
+
+  const fetchCredits = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/credits');
+      setCredits(response.data);
+    } catch (error) {
+      console.error('Error fetching credits:', error.response?.data || error.message);
+      setCredits(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="container">
@@ -11,9 +33,32 @@ const Dashboard = () => {
           <h1 className="card-title">Welcome to your Dashboard, {user.name}!</h1>
         </div>
         <div className="card-body">
-          <div className="grid grid-2">
+          <div className="grid grid-3">
             {user.role === 'coach' ? (
               <>
+                <div className="card">
+                  <div className="card-body">
+                    <h3>Account Credits</h3>
+                    {loading ? (
+                      <p>Loading credits...</p>
+                    ) : credits ? (
+                      <div>
+                        <div style={{ fontSize: '2rem', fontWeight: 'bold', color: credits.balance > 50 ? '#10b981' : credits.balance > 20 ? '#f59e0b' : '#ef4444' }}>
+                          ${credits.balance.toFixed(2)}
+                        </div>
+                        <p style={{ fontSize: '0.8rem', color: '#9ca3af', marginTop: '0.5rem' }}>
+                          Account Balance
+                        </p>
+                      </div>
+                    ) : (
+                      <p>Failed to load credits</p>
+                    )}
+                    <button onClick={fetchCredits} className="btn btn-sm btn-outline-primary" style={{ marginTop: '1rem' }}>
+                      Refresh
+                    </button>
+                  </div>
+                </div>
+
                 <div className="card">
                   <div className="card-body">
                     <h3>Coach Features</h3>
