@@ -123,10 +123,10 @@ const Navbar = () => {
                     top: '100%', 
                     left: '0', 
                     right: '0', 
-                    backgroundColor: 'white', 
-                    border: '1px solid #e5e7eb', 
+                    backgroundColor: '#3b82f6', 
+                    border: '1px solid rgba(255, 255, 255, 0.2)', 
                     borderRadius: '0.375rem', 
-                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', 
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)', 
                     zIndex: 1000,
                     padding: '1rem'
                   }}>
