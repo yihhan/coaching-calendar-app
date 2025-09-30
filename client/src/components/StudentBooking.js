@@ -83,16 +83,18 @@ const StudentBooking = () => {
     });
   };
 
-  // Filter sessions based on search description
+  // Filter sessions based on search in title and description
   const filteredSessions = React.useMemo(() => {
     if (!searchDescription.trim()) {
       return sessions;
     }
     
-    return sessions.filter(session => 
-      session.description && 
-      session.description.toLowerCase().includes(searchDescription.toLowerCase())
-    );
+    const searchTerm = searchDescription.toLowerCase();
+    return sessions.filter(session => {
+      const titleMatch = session.title && session.title.toLowerCase().includes(searchTerm);
+      const descriptionMatch = session.description && session.description.toLowerCase().includes(searchTerm);
+      return titleMatch || descriptionMatch;
+    });
   }, [sessions, searchDescription]);
 
   const bookSession = async (sessionId) => {
@@ -196,11 +198,11 @@ const StudentBooking = () => {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="searchDescription">Search Description</label>
+                    <label htmlFor="searchDescription">Search Sessions</label>
                     <input
                       type="text"
                       id="searchDescription"
-                      placeholder="Search session descriptions..."
+                      placeholder="Search titles and descriptions..."
                       value={searchDescription}
                       onChange={(e) => setSearchDescription(e.target.value)}
                     />
