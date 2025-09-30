@@ -15,6 +15,7 @@ const StudentBooking = () => {
     start_date: '',
     end_date: ''
   });
+  const [searchDescription, setSearchDescription] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -81,6 +82,18 @@ const StudentBooking = () => {
       [e.target.name]: e.target.value
     });
   };
+
+  // Filter sessions based on search description
+  const filteredSessions = React.useMemo(() => {
+    if (!searchDescription.trim()) {
+      return sessions;
+    }
+    
+    return sessions.filter(session => 
+      session.description && 
+      session.description.toLowerCase().includes(searchDescription.toLowerCase())
+    );
+  }, [sessions, searchDescription]);
 
   const bookSession = async (sessionId) => {
     try {
@@ -165,7 +178,7 @@ const StudentBooking = () => {
             <div className="card mb-3">
               <div className="card-body">
                 <h4>Filter Sessions</h4>
-                <div className="grid grid-3">
+                <div className="grid grid-4">
                   <div className="form-group">
                     <label htmlFor="coach_id">Coach</label>
                     <select
@@ -181,6 +194,16 @@ const StudentBooking = () => {
                         </option>
                       ))}
                     </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="searchDescription">Search Description</label>
+                    <input
+                      type="text"
+                      id="searchDescription"
+                      placeholder="Search session descriptions..."
+                      value={searchDescription}
+                      onChange={(e) => setSearchDescription(e.target.value)}
+                    />
                   </div>
                   <div className="form-group">
                     <label htmlFor="expertise">Expertise</label>
@@ -229,14 +252,14 @@ const StudentBooking = () => {
               </div>
             </div>
             
-            {sessions.length === 0 ? (
+            {filteredSessions.length === 0 ? (
               <div className="text-center">
                 <h3>No available sessions found</h3>
                 <p className="text-muted">Try adjusting your filters or check back later!</p>
               </div>
             ) : (
               <div className="grid grid-2">
-                {sessions.map(session => (
+                {filteredSessions.map(session => (
                   <div key={session.id} className="card">
                     <div className="card-body">
                       <h4 className="session-title-truncated" title={session.title}>
