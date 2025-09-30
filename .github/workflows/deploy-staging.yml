@@ -7,30 +7,51 @@ on:
 
 jobs:
   deploy:
+    name: 🔁 Deploy to Staging EC2
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout code
+      - name: 🧾 Checkout repo
         uses: actions/checkout@v3
 
-      - name: 🔐 Setup SSH
+      - name: 🔐 Setup SSH agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.STAGING_SSH_KEY }}
 
-      - name: 🚀 Deploy to EC2
+      - name: 🚀 Deploy to Staging EC2
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} -p ${{ secrets.STAGING_PORT }} << 'EOF'
             set -e
             echo "📍 Connected to staging EC2"
             cd /var/www/coaching-calendar-app
-            echo "🔁 Pulling latest code"
+
+            echo "🔁 Resetting to latest staging"
             git fetch origin
-            git pull --no-rebase origin staging
-            cd client && npm install && npm run build
+            git reset --hard origin/staging
+
+            # Install Node.js if not present
+            if ! command -v npm &> /dev/null; then
+              echo "🔧 Installing Node.js..."
+              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+            fi
+
+            echo "🛠️ Building frontend"
+            cd client
+            npm install
+            npm run build
+
+            echo "📂 Deploying static files"
             sudo cp -r build/* /var/www/html/
-            cd ../server && npm install
-            pm2 restart coaching-api-staging
+
+            echo "🚀 Restarting backend"
+            cd ../server
+            npm install
+            pm2 restart coaching-api-staging || pm2 start index.js --name coaching-api-staging
+
+            echo "🌐 Reloading nginx"
             sudo systemctl reload nginx
-            echo "✅ Deployed to staging successfully"
+
+            echo "✅ Deployment done"
           EOF
