@@ -83,17 +83,22 @@ const StudentBooking = () => {
     });
   };
 
-  // Filter sessions based on search in title and description
+  // Filter sessions based on search in title and description (supports multiple words)
   const filteredSessions = React.useMemo(() => {
     if (!searchDescription.trim()) {
       return sessions;
     }
     
-    const searchTerm = searchDescription.toLowerCase();
+    // Split search terms by spaces and filter out empty strings
+    const searchTerms = searchDescription.toLowerCase().split(' ').filter(term => term.length > 0);
+    
     return sessions.filter(session => {
-      const titleMatch = session.title && session.title.toLowerCase().includes(searchTerm);
-      const descriptionMatch = session.description && session.description.toLowerCase().includes(searchTerm);
-      return titleMatch || descriptionMatch;
+      const title = (session.title || '').toLowerCase();
+      const description = (session.description || '').toLowerCase();
+      const combinedText = title + ' ' + description;
+      
+      // All search terms must be found somewhere in the combined title + description
+      return searchTerms.every(term => combinedText.includes(term));
     });
   }, [sessions, searchDescription]);
 
