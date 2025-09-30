@@ -1,0 +1,43 @@
+name: 🚀 Deploy to Staging
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  deploy:
+    name: 🔄 Deploy on EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.STAGING_SSH_KEY }}
+
+      - name: 🚀 Deploy to EC2 (Staging)
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} << 'EOF'
+            set -e
+            cd /var/www/coaching-calendar-staging
+            git pull origin staging
+
+            echo "🔧 Installing dependencies..."
+            cd server && npm install
+            cd ../client && npm install
+
+            echo "🛠 Building frontend..."
+            export REACT_APP_API_URL=https://staging.calla.sg
+            npm run build
+            sudo cp -r build/* /var/www/html-staging/
+
+            echo "🚦 Restarting backend..."
+            pm2 restart coaching-api-staging
+
+            echo "🌐 Reloading Nginx..."
+            sudo systemctl reload nginx
+          EOF
