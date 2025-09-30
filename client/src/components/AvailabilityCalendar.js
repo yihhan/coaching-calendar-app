@@ -11,7 +11,6 @@ const AvailabilityCalendar = () => {
   const [loading, setLoading] = useState(true);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedCoach, setSelectedCoach] = useState('');
-  const [searchDescription, setSearchDescription] = useState('');
   const [viewMode, setViewMode] = useState(() => {
     // Default to list view on mobile devices in portrait, month in landscape
     if (window.innerWidth <= 768) {
@@ -107,18 +106,6 @@ const AvailabilityCalendar = () => {
     }
   }, [fetchCoaches, fetchSessions]);
 
-  // Filter sessions based on search description
-  const filteredSessions = React.useMemo(() => {
-    if (!searchDescription.trim()) {
-      return sessions;
-    }
-    
-    return sessions.filter(session => 
-      session.description && 
-      session.description.toLowerCase().includes(searchDescription.toLowerCase())
-    );
-  }, [sessions, searchDescription]);
-
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -158,8 +145,8 @@ const AvailabilityCalendar = () => {
     if (!date) return [];
     // Use local date string instead of ISO string to avoid timezone issues
     const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    console.log(`Looking for sessions on ${dateStr}, total sessions: ${filteredSessions.length}`);
-    const daySessions = filteredSessions.filter(session => {
+    console.log(`Looking for sessions on ${dateStr}, total sessions: ${sessions.length}`);
+    const daySessions = sessions.filter(session => {
       // Handle the session time format properly
       let sessionDateStr;
       if (session.start_time.includes('T')) {
@@ -213,7 +200,7 @@ const AvailabilityCalendar = () => {
 
   const renderListView = () => {
     // Group sessions by date
-    const groupedSessions = filteredSessions.reduce((groups, session) => {
+    const groupedSessions = sessions.reduce((groups, session) => {
       const date = new Date(session.start_time).toDateString();
       if (!groups[date]) {
         groups[date] = [];
@@ -517,7 +504,7 @@ const AvailabilityCalendar = () => {
               </h5>
               <div className="row g-3 align-items-end">
                 {!(user && user.role === 'coach') && (
-                  <div className="col-md-3">
+                  <div className="col-md-4">
                     <label htmlFor="coachFilter" className="form-label fw-semibold mb-2" style={{ color: '#475569' }}>
                       Coach
                     </label>
@@ -546,29 +533,6 @@ const AvailabilityCalendar = () => {
                     </select>
                   </div>
                 )}
-                {user && user.role === 'student' && (
-                  <div className="col-md-3">
-                    <label htmlFor="searchDescription" className="form-label fw-semibold mb-2" style={{ color: '#475569' }}>
-                      Search Description
-                    </label>
-                    <input
-                      id="searchDescription"
-                      type="text"
-                      className="form-control"
-                      placeholder="Search session descriptions..."
-                      value={searchDescription}
-                      onChange={(e) => setSearchDescription(e.target.value)}
-                      style={{ 
-                        border: '1px solid #d1d5db', 
-                        borderRadius: '8px',
-                        padding: '10px 12px',
-                        fontSize: '14px',
-                        backgroundColor: '#ffffff',
-                        height: '42px'
-                      }}
-                    />
-                  </div>
-                )}
                 <div className="col-md-4">
                   <label htmlFor="viewMode" className="form-label fw-semibold mb-2" style={{ color: '#475569' }}>
                     View Mode
@@ -594,7 +558,7 @@ const AvailabilityCalendar = () => {
                     <option value="list">List</option>
                   </select>
                 </div>
-                <div className="col-md-3">
+                <div className="col-md-4">
                   <label htmlFor="datePicker" className="form-label fw-semibold mb-2" style={{ color: '#475569' }}>
                     Go to Date
                   </label>
