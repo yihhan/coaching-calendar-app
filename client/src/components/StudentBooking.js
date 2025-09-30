@@ -201,7 +201,7 @@ const StudentBooking = () => {
             <div className="card mb-3">
               <div className="card-body">
                 <h4>Filter Sessions</h4>
-                <div className="grid grid-4">
+                <div className="grid grid-3">
                   <div className="form-group">
                     <label htmlFor="coach_id">Coach</label>
                     <select
@@ -249,28 +249,35 @@ const StudentBooking = () => {
                       <option value="Music">Music</option>
                     </select>
                   </div>
-                  
-                  <div className="form-group">
-                    <label htmlFor="start_date">From Date</label>
-                    <input
-                      type="date"
-                      id="start_date"
-                      name="start_date"
-                      value={filters.start_date}
-                      onChange={handleFilterChange}
-                    />
+                </div>
+                
+                <div className="form-group" style={{ marginTop: '1rem' }}>
+                  <label>Date Range</label>
+                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <div style={{ flex: 1 }}>
+                      <label htmlFor="start_date" style={{ fontSize: '0.875rem', marginBottom: '0.25rem', display: 'block' }}>From Date</label>
+                      <input
+                        type="date"
+                        id="start_date"
+                        name="start_date"
+                        value={filters.start_date}
+                        onChange={handleFilterChange}
+                        style={{ width: '100%' }}
+                      />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label htmlFor="end_date" style={{ fontSize: '0.875rem', marginBottom: '0.25rem', display: 'block' }}>To Date</label>
+                      <input
+                        type="date"
+                        id="end_date"
+                        name="end_date"
+                        value={filters.end_date}
+                        onChange={handleFilterChange}
+                        style={{ width: '100%' }}
+                      />
+                    </div>
                   </div>
-                  
-                  <div className="form-group">
-                    <label htmlFor="end_date">To Date</label>
-                    <input
-                      type="date"
-                      id="end_date"
-                      name="end_date"
-                      value={filters.end_date}
-                      onChange={handleFilterChange}
-                    />
-                  </div>
+                </div>
                 </div>
               </div>
             </div>
