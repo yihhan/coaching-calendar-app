@@ -83,7 +83,7 @@ const StudentBooking = () => {
     });
   };
 
-  // Filter sessions based on search in title and description (supports multiple words)
+  // Filter sessions based on search in title, description, and coach name (supports multiple words)
   const filteredSessions = React.useMemo(() => {
     if (!searchDescription.trim()) {
       return sessions;
@@ -95,9 +95,10 @@ const StudentBooking = () => {
     return sessions.filter(session => {
       const title = (session.title || '').toLowerCase();
       const description = (session.description || '').toLowerCase();
-      const combinedText = title + ' ' + description;
+      const coachName = (session.coach_name || '').toLowerCase();
+      const combinedText = title + ' ' + description + ' ' + coachName;
       
-      // All search terms must be found somewhere in the combined title + description
+      // All search terms must be found somewhere in the combined title + description + coach name
       return searchTerms.every(term => combinedText.includes(term));
     });
   }, [sessions, searchDescription]);
@@ -207,7 +208,7 @@ const StudentBooking = () => {
                     <input
                       type="text"
                       id="searchDescription"
-                      placeholder="Search titles and descriptions..."
+                      placeholder="Search titles, descriptions, coaches..."
                       value={searchDescription}
                       onChange={(e) => setSearchDescription(e.target.value)}
                     />
