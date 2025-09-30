@@ -43,6 +43,7 @@ jobs:
             npm run build
 
             echo "📂 Deploying static files"
+            sudo mkdir -p /var/www/html/
             sudo cp -r build/* /var/www/html/
 
             echo "🚀 Restarting backend"
