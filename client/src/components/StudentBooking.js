@@ -278,7 +278,6 @@ const StudentBooking = () => {
                     </div>
                   </div>
                 </div>
-                </div>
               </div>
             </div>
             
