@@ -24,7 +24,9 @@ jobs:
             set -e
             echo "📍 Connected to staging EC2"
             cd /var/www/coaching-calendar-app
-            git pull origin staging
+            echo "🔁 Pulling latest code"
+            git fetch origin
+            git pull --no-rebase origin staging
             cd client && npm install && npm run build
             sudo cp -r build/* /var/www/html/
             cd ../server && npm install
