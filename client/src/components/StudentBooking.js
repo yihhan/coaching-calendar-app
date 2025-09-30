@@ -89,8 +89,23 @@ const StudentBooking = () => {
       return sessions;
     }
     
-    // Split search terms by spaces and filter out empty strings
-    const searchTerms = searchDescription.toLowerCase().split(' ').filter(term => term.length > 0);
+    // Common stop words to ignore in search
+    const stopWords = new Set([
+      'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from',
+      'has', 'he', 'in', 'is', 'it', 'its', 'of', 'on', 'that', 'the',
+      'to', 'was', 'will', 'with', 'or', 'but', 'not', 'can', 'have',
+      'this', 'these', 'they', 'we', 'you', 'your', 'our', 'their'
+    ]);
+    
+    // Split search terms by spaces and filter out empty strings and stop words
+    const searchTerms = searchDescription.toLowerCase()
+      .split(' ')
+      .filter(term => term.length > 0 && !stopWords.has(term));
+    
+    // If no meaningful search terms after filtering stop words, show all sessions
+    if (searchTerms.length === 0) {
+      return sessions;
+    }
     
     return sessions.filter(session => {
       const title = (session.title || '').toLowerCase();
