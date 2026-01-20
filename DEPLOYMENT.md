@@ -74,7 +74,7 @@ sudo chown -R ubuntu:ubuntu /var/www/coaching-calendar-app
 
 ```bash
 cd /var/www/coaching-calendar-app
-git clone https://github.com/yihhan/coaching-calendar-app.git .
+git clone -b master https://github.com/yihhan/coaching-calendar-app.git .
 ```
 
 ### Step 4: Install Dependencies
@@ -213,7 +213,7 @@ Or manually:
 
 ```bash
 cd /var/www/coaching-calendar-app
-git pull origin main
+git pull origin master
 cd server && npm install
 cd ../client && npm install && npm run build
 sudo cp -r build/* /var/www/html/

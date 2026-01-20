@@ -141,7 +141,7 @@ print_warning "Please update the repository URL in this script with your actual 
 print_warning "Current placeholder: https://github.com/yihhan/coaching-calendar-app.git"
 
 # Uncomment and update this line with your actual repository:
-# git clone https://github.com/yihhan/coaching-calendar-app.git .
+# git clone -b master https://github.com/yihhan/coaching-calendar-app.git .
 
 # For now, create a placeholder structure
 mkdir -p server client
@@ -406,7 +406,7 @@ echo "   - /var/www/coaching-calendar-app/server/.env"
 echo "   - /etc/nginx/sites-available/coaching-calendar"
 echo "3. Clone your actual repository:"
 echo "   cd /var/www/coaching-calendar-app"
-echo "   git clone https://github.com/yihhan/coaching-calendar-app.git ."
+echo "   git clone -b master https://github.com/yihhan/coaching-calendar-app.git ."
 echo "4. Install dependencies and rebuild:"
 echo "   cd server && npm install"
 echo "   cd ../client && npm install && npm run build"
