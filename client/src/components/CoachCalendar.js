@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 import TruncatedText from './TruncatedText';
@@ -10,6 +10,9 @@ const CoachCalendar = () => {
   const [pendingBookings, setPendingBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [students, setStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [studentSearch, setStudentSearch] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -20,7 +23,9 @@ const CoachCalendar = () => {
     max_students: 1,
     price: 0,
     repeat_interval: 'none',
-    occurrences: 1
+    occurrences: 1,
+    visibility: 'public',
+    whitelist_student_ids: []
   });
 
   // Build user-friendly 15-min interval time options (06:00 - 22:45)
@@ -47,6 +52,51 @@ const CoachCalendar = () => {
       setFormData(prev => ({ ...prev, start_time: composed }));
     }
   };
+
+  // Fetch students for whitelist selection
+  const fetchStudents = async () => {
+    setLoadingStudents(true);
+    try {
+      const response = await api.get('/students');
+      setStudents(response.data || []);
+    } catch (error) {
+      console.error('Failed to fetch students:', error);
+      toast.error('Failed to load students list');
+    } finally {
+      setLoadingStudents(false);
+    }
+  };
+
+  // Load students when form opens and visibility is whitelist
+  useEffect(() => {
+    if (showForm && formData.visibility === 'whitelist' && students.length === 0) {
+      fetchStudents();
+    }
+  }, [showForm, formData.visibility]);
+
+  // Toggle student selection for whitelist
+  const toggleStudentSelection = (studentId) => {
+    setFormData(prev => {
+      const currentIds = prev.whitelist_student_ids || [];
+      const isSelected = currentIds.includes(studentId);
+      return {
+        ...prev,
+        whitelist_student_ids: isSelected
+          ? currentIds.filter(id => id !== studentId)
+          : [...currentIds, studentId]
+      };
+    });
+  };
+
+  // Filter students based on search
+  const filteredStudents = students.filter(student => {
+    if (!studentSearch) return true;
+    const searchLower = studentSearch.toLowerCase();
+    return (
+      student.name?.toLowerCase().includes(searchLower) ||
+      student.email?.toLowerCase().includes(searchLower)
+    );
+  });
 
   useEffect(() => {
     fetchSessions();
@@ -96,7 +146,18 @@ const CoachCalendar = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [name]: value };
+      // If visibility changes to whitelist, load students if not already loaded
+      if (name === 'visibility' && value === 'whitelist' && students.length === 0) {
+        fetchStudents();
+      }
+      // If visibility changes away from whitelist, clear whitelist selection
+      if (name === 'visibility' && value !== 'whitelist') {
+        updated.whitelist_student_ids = [];
+      }
+      return updated;
+    });
     if (name === 'start_date') {
       updateStartTimeFromParts({ start_date: value });
     } else if (name === 'start_time_slot') {
@@ -136,16 +197,24 @@ const CoachCalendar = () => {
         return `${year}-${month}-${day}T${hours}:${minutes}`;
       };
 
-      const payload = {
-        title: formData.title,
-        description: formData.description,
-        start_time: formatDateTime(start),
-        end_time: formatDateTime(end),
-        max_students: formData.max_students,
-        price: formData.price,
-        repeat_interval: formData.repeat_interval,
-        occurrences: formData.occurrences
-      };
+        const payload = {
+          title: formData.title,
+          description: formData.description,
+          start_time: formatDateTime(start),
+          end_time: formatDateTime(end),
+          max_students: formData.max_students,
+          price: formData.price,
+          repeat_interval: formData.repeat_interval,
+          occurrences: formData.occurrences,
+          visibility: formData.visibility || 'public',
+          whitelist_student_ids: formData.visibility === 'whitelist' ? (formData.whitelist_student_ids || []) : []
+        };
+
+        // Validate whitelist selection
+        if (formData.visibility === 'whitelist' && (!formData.whitelist_student_ids || formData.whitelist_student_ids.length === 0)) {
+          toast.error('Please select at least one student for whitelist visibility'); // Show error message
+          return;
+        }
 
       const res = await api.post('/sessions', payload);
       const data = res?.data || {};
@@ -164,18 +233,20 @@ const CoachCalendar = () => {
         toast.success(t('sessions.createdSuccess'));
       }
       setShowForm(false);
-      setFormData({
-        title: '',
-        description: '',
-        start_time: '',
-        start_date: '',
-        start_time_slot: '',
-        duration_minutes: 60,
-        max_students: 1,
-        price: 0,
-        repeat_interval: 'none',
-        occurrences: 1
-      });
+        setFormData({
+          title: '',
+          description: '',
+          start_time: '',
+          start_date: '',
+          start_time_slot: '',
+          duration_minutes: 60,
+          max_students: 1,
+          price: 0,
+          repeat_interval: 'none',
+          occurrences: 1,
+          visibility: 'public',
+          whitelist_student_ids: []
+        });
       fetchSessions();
     } catch (error) {
       toast.error(error.response?.data?.error || t('sessions.createError'));
@@ -353,6 +424,85 @@ const CoachCalendar = () => {
                   <small className="text-muted">{t('sessions.occurrencesMax')}</small>
                 </div>
               </div>
+
+              {/* Visibility Settings - Who Can See This Session */}
+              <div className="form-group" style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0' }}>
+                <label htmlFor="visibility" style={{ fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                  {t('sessions.visibility')}
+                </label>
+                <select
+                  id="visibility"
+                  name="visibility"
+                  value={formData.visibility}
+                  onChange={handleChange}
+                  style={{ width: '100%', padding: '0.5rem', marginBottom: '0.5rem' }}
+                >
+                  <option value="public">{t('sessions.visibilityPublic')}</option>
+                  <option value="subscribers_only">{t('sessions.visibilitySubscribers')}</option>
+                  <option value="whitelist">{t('sessions.visibilityWhitelist')}</option>
+                </select>
+                <small className="text-muted" style={{ display: 'block', marginTop: '0.25rem' }}>
+                  {formData.visibility === 'public' && t('sessions.visibilityPublicDesc')}
+                  {formData.visibility === 'subscribers_only' && t('sessions.visibilitySubscribersDesc')}
+                  {formData.visibility === 'whitelist' && t('sessions.visibilityWhitelistDesc')}
+                </small>
+              </div>
+
+              {/* Student Selection for Whitelist */}
+              {formData.visibility === 'whitelist' && (
+                <div className="form-group" style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '5px', marginTop: '10px' }}>
+                  <label>{t('sessions.selectStudents')}</label>
+                  <input
+                    type="text"
+                    placeholder={t('sessions.searchStudents')}
+                    value={studentSearch}
+                    onChange={(e) => setStudentSearch(e.target.value)}
+                    style={{ marginBottom: '10px', width: '100%', padding: '8px' }}
+                  />
+                  {loadingStudents ? (
+                    <p>{t('sessions.loadingStudents')}</p>
+                  ) : (
+                    <>
+                      <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '3px' }}>
+                        {filteredStudents.length === 0 ? (
+                          <p className="text-muted">{t('sessions.noStudentsSelected')}</p>
+                        ) : (
+                          filteredStudents.map(student => {
+                            const isSelected = (formData.whitelist_student_ids || []).includes(student.id);
+                            return (
+                              <div
+                                key={student.id}
+                                onClick={() => toggleStudentSelection(student.id)}
+                                style={{
+                                  padding: '8px',
+                                  marginBottom: '5px',
+                                  cursor: 'pointer',
+                                  backgroundColor: isSelected ? '#e3f2fd' : '#f5f5f5',
+                                  border: isSelected ? '2px solid #2196f3' : '1px solid #ddd',
+                                  borderRadius: '3px'
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={() => toggleStudentSelection(student.id)}
+                                  style={{ marginRight: '8px' }}
+                                />
+                                <strong>{student.name}</strong> ({student.email})
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                      {(formData.whitelist_student_ids || []).length > 0 && (
+                        <div style={{ marginTop: '10px', padding: '8px', backgroundColor: '#f0f0f0', borderRadius: '3px' }}>
+                          <strong>{t('sessions.selectedStudents')}:</strong> {(formData.whitelist_student_ids || []).length}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
               
               <button type="submit" className="btn btn-success">
                 {t('sessions.createButton')}
