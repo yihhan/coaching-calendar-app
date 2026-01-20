@@ -418,6 +418,33 @@ db.serialize(() => {
       console.log('✅ Coach subscriptions table ready');
     }
   });
+
+  // Session visibility whitelist (for private sessions - who can see them)
+  db.run(`CREATE TABLE IF NOT EXISTS session_visibility_whitelist (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id INTEGER NOT NULL,
+    student_id INTEGER NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (session_id) REFERENCES sessions (id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES users (id),
+    UNIQUE(session_id, student_id)
+  )`, (err) => {
+    if (err) {
+      console.error('Error creating session_visibility_whitelist table:', err);
+    } else {
+      console.log('✅ Session visibility whitelist table ready');
+    }
+  });
+
+  // Add visibility column to sessions table if it doesn't exist
+  // Note: ALTER TABLE ADD COLUMN doesn't support IF NOT EXISTS in SQLite
+  // We'll try to add it and ignore the error if it already exists
+  db.run(`ALTER TABLE sessions ADD COLUMN visibility TEXT DEFAULT 'public'`, (err) => {
+    // SQLite returns error if column exists, which is fine
+    if (err && !err.message.includes('duplicate column name')) {
+      console.error('Error adding visibility column:', err);
+    }
+  });
 });
 
 // Authentication middleware
@@ -832,19 +859,41 @@ app.post('/api/sessions', authenticateToken, [
           return processOccurrence(index + 1);
         }
 
+        // Get visibility and whitelist from request
+        const visibility = req.body.visibility || 'public'; // Default to public
+        const whitelist_student_ids = Array.isArray(req.body.whitelist_student_ids) ? req.body.whitelist_student_ids : []; // Array of student IDs for whitelist
+
         // Insert this occurrence
         db.run(
-          'INSERT INTO sessions (coach_id, title, description, start_time, end_time, max_students, price) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          [req.user.id, title, description, sStr, eStr, max_students, price],
+          'INSERT INTO sessions (coach_id, title, description, start_time, end_time, max_students, price, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+          [req.user.id, title, description, sStr, eStr, max_students, price, visibility],
           function(insertErr) {
             if (insertErr) {
               return res.status(500).json({ error: 'Database error' });
             }
             const sessionId = this.lastID;
-            created.push({ id: sessionId, title, description, start_time: sStr, end_time: eStr, max_students, price });
+            created.push({ id: sessionId, title, description, start_time: sStr, end_time: eStr, max_students, price, visibility });
+
+            // If visibility is 'whitelist', add students to whitelist
+            if (visibility === 'whitelist' && whitelist_student_ids.length > 0) {
+              whitelist_student_ids.forEach((studentId) => {
+                db.run(
+                  'INSERT INTO session_visibility_whitelist (session_id, student_id) VALUES (?, ?)',
+                  [sessionId, parseInt(studentId)],
+                  (whitelistErr) => {
+                    if (whitelistErr) {
+                      console.error(`Error adding student ${studentId} to whitelist:`, whitelistErr);
+                    }
+                  }
+                );
+              });
+            }
             
             // Notify subscribed students about the new session (non-blocking)
-            if (index === 0) { // Only send notification for the first occurrence to avoid spam
+            // Only notify if visibility is 'public' or 'subscribers_only'
+            if (index === 0 && (visibility === 'public' || visibility === 'subscribers_only')) {
+              // For subscribers_only, only notify subscribers
+              // For public, notify all subscribers
               db.all(
                 `SELECT u.email, u.name as student_name 
                  FROM coach_subscriptions cs
@@ -876,6 +925,41 @@ app.post('/api/sessions', authenticateToken, [
                       }
                     }
                     console.log(`📧 Sent new session notifications to ${subscribers.length} subscribed student(s)`);
+                  }
+                }
+              );
+            }
+
+            // For whitelist visibility, notify only whitelisted students
+            if (index === 0 && visibility === 'whitelist' && whitelist_student_ids.length > 0) {
+              const studentIdPlaceholders = whitelist_student_ids.map(() => '?').join(',');
+              db.all(
+                `SELECT email, name as student_name FROM users WHERE id IN (${studentIdPlaceholders}) AND role = 'student'`,
+                whitelist_student_ids.map(id => parseInt(id)),
+                async (whitelistErr, whitelistedStudents) => {
+                  if (!whitelistErr && whitelistedStudents && whitelistedStudents.length > 0) {
+                    const sessionDate = new Date(sStr).toLocaleDateString();
+                    const sessionTime = new Date(sStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const coachName = req.user.name || 'Coach';
+                    
+                    for (const student of whitelistedStudents) {
+                      try {
+                        await sendNewSessionNotification(
+                          student.email,
+                          student.student_name,
+                          coachName,
+                          title,
+                          description,
+                          sessionDate,
+                          sessionTime,
+                          price,
+                          max_students
+                        );
+                      } catch (notifyErr) {
+                        console.error(`Failed to send new session notification to ${student.email}:`, notifyErr);
+                      }
+                    }
+                    console.log(`📧 Sent new session notifications to ${whitelistedStudents.length} whitelisted student(s)`);
                   }
                 }
               );
@@ -960,8 +1044,9 @@ app.delete('/api/sessions/:id', authenticateToken, (req, res) => {
 });
 
 // Get all available sessions (for students)
-app.get('/api/sessions/available', (req, res) => {
+app.get('/api/sessions/available', authenticateToken, (req, res) => {
   const { coach_id, start_date, end_date, expertise } = req.query;
+  const studentId = req.user && req.user.role === 'student' ? req.user.id : null;
   
   let query = `
     SELECT 
@@ -977,6 +1062,30 @@ app.get('/api/sessions/available', (req, res) => {
   `;
   
   const params = [];
+  
+  // Visibility filtering: Only show sessions the student is allowed to see
+  if (studentId) {
+    const studentIdInt = typeof studentId === 'string' ? parseInt(studentId, 10) : studentId;
+    // Use explicit exclusion approach: Show sessions EXCEPT restricted ones the student can't access
+    // This ensures subscribers_only sessions are hidden if student is not subscribed
+    // and whitelist sessions are hidden if student is not whitelisted
+    query += ` AND NOT (
+      (s.visibility = 'subscribers_only' AND NOT EXISTS (
+        SELECT 1 FROM coach_subscriptions cs 
+        WHERE cs.coach_id = s.coach_id 
+        AND cs.student_id = ?
+      ))
+      OR (s.visibility = 'whitelist' AND NOT EXISTS (
+        SELECT 1 FROM session_visibility_whitelist svw 
+        WHERE svw.session_id = s.id 
+        AND svw.student_id = ?
+      ))
+    )`;
+    params.push(studentIdInt, studentIdInt);
+  } else {
+    // If not authenticated as student, only show public sessions (or NULL for backward compatibility)
+    query += ` AND (s.visibility = 'public' OR s.visibility IS NULL)`;
+  }
   
   if (coach_id) {
     query += ' AND s.coach_id = ?';
@@ -1001,6 +1110,7 @@ app.get('/api/sessions/available', (req, res) => {
   
   db.all(query, params, (err, sessions) => {
     if (err) {
+      console.error('Error fetching available sessions:', err);
       return res.status(500).json({ error: 'Database error' });
     }
     res.json(sessions);
@@ -1008,18 +1118,31 @@ app.get('/api/sessions/available', (req, res) => {
 });
 
 // Get all sessions for availability calendar (shows both available and booked)
+// This endpoint allows optional authentication - if authenticated, respects visibility; if not, shows only public
 app.get('/api/sessions/calendar', (req, res) => {
   const { start_date, end_date } = req.query;
   let coach_id = req.query.coach_id;
+  let studentId = null;
 
-  // If a valid JWT is provided and the user is a coach, force-filter to their own sessions
+  // Try to authenticate if token is provided (optional)
   const authHeader = req.headers['authorization'];
+  let authenticatedCoachId = null;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     try {
       const token = authHeader.split(' ')[1];
       const payload = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-      if (payload && payload.role === 'coach') {
-        coach_id = String(payload.id);
+      if (payload) {
+        if (payload.role === 'coach') {
+          // Track if the authenticated user is a coach viewing their own sessions
+          authenticatedCoachId = String(payload.id);
+          // If no coach_id is specified in query, default to their own sessions
+          if (!coach_id) {
+            coach_id = authenticatedCoachId;
+          }
+        } else if (payload.role === 'student') {
+          // Students need visibility filtering
+          studentId = payload.id;
+        }
       }
     } catch (_) {
       // Ignore invalid tokens; treat as public request
@@ -1045,9 +1168,62 @@ app.get('/api/sessions/calendar', (req, res) => {
   
   const params = [];
   
+  // Visibility filtering: Only show sessions the user is allowed to see
+  // Coaches see all their own sessions (handled by coach_id filter)
+  // Students see sessions based on visibility rules (even when filtering by coach)
+  // Unauthenticated users see only public sessions
+  
+  // First, handle coach filtering
   if (coach_id) {
     query += ' AND s.coach_id = ?';
     params.push(coach_id);
+    
+    // If the authenticated user is the coach themselves, they see all their sessions
+    // Otherwise, apply visibility filtering
+    const isOwnCoach = authenticatedCoachId && coach_id === authenticatedCoachId;
+    if (!isOwnCoach) {
+      // Apply visibility filtering for students or unauthenticated users viewing a coach
+      if (studentId) {
+        // Student viewing a specific coach - use explicit exclusion
+        const studentIdInt = typeof studentId === 'string' ? parseInt(studentId, 10) : studentId;
+        query += ` AND NOT (
+          (s.visibility = 'subscribers_only' AND NOT EXISTS (
+            SELECT 1 FROM coach_subscriptions cs 
+            WHERE cs.coach_id = s.coach_id 
+            AND cs.student_id = ?
+          ))
+          OR (s.visibility = 'whitelist' AND NOT EXISTS (
+            SELECT 1 FROM session_visibility_whitelist svw 
+            WHERE svw.session_id = s.id 
+            AND svw.student_id = ?
+          ))
+        )`;
+        params.push(studentIdInt, studentIdInt);
+      } else {
+        // Unauthenticated user viewing a coach - only public sessions (or NULL for backward compatibility)
+        query += ` AND (s.visibility = 'public' OR s.visibility IS NULL)`;
+      }
+    }
+    // If it's the coach viewing their own sessions, no visibility filter needed
+  } else if (studentId) {
+    // Student viewing all coaches - use explicit exclusion
+    const studentIdInt = typeof studentId === 'string' ? parseInt(studentId, 10) : studentId;
+    query += ` AND NOT (
+      (s.visibility = 'subscribers_only' AND NOT EXISTS (
+        SELECT 1 FROM coach_subscriptions cs 
+        WHERE cs.coach_id = s.coach_id 
+        AND cs.student_id = ?
+      ))
+      OR (s.visibility = 'whitelist' AND NOT EXISTS (
+        SELECT 1 FROM session_visibility_whitelist svw 
+        WHERE svw.session_id = s.id 
+        AND svw.student_id = ?
+      ))
+    )`;
+    params.push(studentIdInt, studentIdInt);
+  } else {
+    // Not authenticated and no coach filter - only show public sessions (or NULL for backward compatibility)
+    query += ` AND (s.visibility = 'public' OR s.visibility IS NULL)`;
   }
   
   if (start_date) {
@@ -1064,6 +1240,7 @@ app.get('/api/sessions/calendar', (req, res) => {
   
   db.all(query, params, (err, sessions) => {
     if (err) {
+      console.error('Error fetching calendar sessions:', err);
       return res.status(500).json({ error: 'Database error' });
     }
     res.json(sessions);
@@ -1252,6 +1429,24 @@ app.get('/api/bookings/pending', authenticateToken, (req, res) => {
         return res.status(500).json({ error: 'Database error' });
       }
       res.json(bookings);
+    }
+  );
+});
+
+// Get all students (for coaches to select for whitelist)
+app.get('/api/students', authenticateToken, (req, res) => {
+  if (req.user.role !== 'coach') {
+    return res.status(403).json({ error: 'Only coaches can view students' });
+  }
+
+  db.all(
+    'SELECT id, name, email, created_at FROM users WHERE role = ? ORDER BY name',
+    ['student'],
+    (err, students) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+      res.json(students);
     }
   );
 });

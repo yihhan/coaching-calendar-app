@@ -266,29 +266,39 @@ const StudentBooking = () => {
                 {sessions.map(session => (
                   <div key={session.id} className="card">
                     <div className="card-body">
-                      <div className="d-flex justify-content-between align-items-start mb-2">
-                        <div style={{ flex: 1 }}>
-                          <h4 className="session-title-truncated" title={session.title} style={{ marginBottom: '0.25rem' }}>
-                            {session.title.toUpperCase()}
-                          </h4>
-                          <p className="text-muted mb-0">by {session.coach_name}</p>
-                        </div>
-                        {session.coach_id && !isSubscribed(session.coach_id) && (
-                          <button
-                            className="btn btn-sm btn-outline-primary"
-                            onClick={() => handleSubscribe(session.coach_id, session.coach_name)}
-                            disabled={subscribing[session.coach_id]}
-                            title={t('subscriptions.followTooltip')}
-                            style={{ marginLeft: '0.5rem', whiteSpace: 'nowrap' }}
-                          >
-                            {subscribing[session.coach_id] ? '...' : `🔔 ${t('subscriptions.follow')}`}
-                          </button>
-                        )}
-                        {session.coach_id && isSubscribed(session.coach_id) && (
-                          <span className="badge badge-success" style={{ marginLeft: '0.5rem' }} title={t('subscriptions.followingTooltip')}>
-                            {t('subscriptions.following')}
-                          </span>
-                        )}
+                      <div className="mb-2">
+                        <h4 className="session-title-truncated" title={session.title} style={{ marginBottom: '0.25rem' }}>
+                          {session.title.toUpperCase()}
+                        </h4>
+                        <p className="text-muted mb-0 d-flex align-items-center" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
+                          <span>by {session.coach_name}</span>
+                          {session.coach_id && !isSubscribed(session.coach_id) && (
+                            <button
+                              onClick={() => handleSubscribe(session.coach_id, session.coach_name)}
+                              disabled={subscribing[session.coach_id]}
+                              title={t('subscriptions.followTooltip')}
+                              style={{ 
+                                whiteSpace: 'nowrap',
+                                padding: '0.15rem 0.4rem',
+                                fontSize: '0.7rem',
+                                lineHeight: '1.1',
+                                background: 'transparent',
+                                border: '1px solid #6c757d',
+                                color: '#6c757d',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                marginLeft: '0.25rem'
+                              }}
+                            >
+                              {subscribing[session.coach_id] ? '...' : `🔔 ${t('subscriptions.follow')}`}
+                            </button>
+                          )}
+                          {session.coach_id && isSubscribed(session.coach_id) && (
+                            <span className="badge badge-success" style={{ marginLeft: '0.25rem' }} title={t('subscriptions.followingTooltip')}>
+                              {t('subscriptions.following')}
+                            </span>
+                          )}
+                        </p>
                       </div>
                       
                       {session.description && (
