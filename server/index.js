@@ -1354,6 +1354,10 @@ app.put('/api/bookings/:id/approve', authenticateToken, (req, res) => {
       );
     }
   );
+  } catch (error) {
+    console.error('Error in approve booking endpoint:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // Reject booking
