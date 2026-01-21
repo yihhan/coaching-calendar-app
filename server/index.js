@@ -1249,20 +1249,25 @@ app.get('/api/sessions/calendar', (req, res) => {
 
 // Approve booking
 app.put('/api/bookings/:id/approve', authenticateToken, (req, res) => {
-  if (req.user.role !== 'coach') {
-    return res.status(403).json({ error: 'Only coaches can approve bookings' });
-  }
+  try {
+    if (req.user.role !== 'coach') {
+      return res.status(403).json({ error: 'Only coaches can approve bookings' });
+    }
 
-  const bookingId = req.params.id;
+    const bookingId = parseInt(req.params.id, 10);
+    if (isNaN(bookingId)) {
+      return res.status(400).json({ error: 'Invalid booking ID' });
+    }
 
-  // First check if the booking exists and belongs to a session owned by this coach
-  db.get(
-    'SELECT b.*, s.coach_id FROM bookings b JOIN sessions s ON b.session_id = s.id WHERE b.id = ? AND s.coach_id = ?',
-    [bookingId, req.user.id],
-    (err, booking) => {
-      if (err) {
-        return res.status(500).json({ error: 'Database error' });
-      }
+    // First check if the booking exists and belongs to a session owned by this coach
+    db.get(
+      'SELECT b.*, s.coach_id FROM bookings b JOIN sessions s ON b.session_id = s.id WHERE b.id = ? AND s.coach_id = ?',
+      [bookingId, req.user.id],
+      (err, booking) => {
+        if (err) {
+          console.error('Error fetching booking:', err);
+          return res.status(500).json({ error: 'Database error' });
+        }
 
       if (!booking) {
         return res.status(404).json({ error: 'Booking not found or not authorized' });
