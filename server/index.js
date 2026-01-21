@@ -1311,7 +1311,13 @@ app.put('/api/bookings/:id/approve', authenticateToken, (req, res) => {
                 return res.status(500).json({ error: 'Database error' });
               }
 
-              // Notify student (non-blocking)
+              // Send response FIRST, then handle email notification asynchronously
+              res.json({
+                message: 'Booking approved successfully',
+                booking: { id: bookingId, status: 'confirmed' }
+              });
+
+              // Notify student (non-blocking, happens after response is sent)
               db.get(
                 `SELECT s.title, s.start_time, u.name as coach_name, u2.name as student_name, u2.email as student_email
                  FROM bookings b
@@ -1321,31 +1327,31 @@ app.put('/api/bookings/:id/approve', authenticateToken, (req, res) => {
                  WHERE b.id = ?`,
                 [bookingId],
                 async (infoErr, info) => {
-                  if (!infoErr && info) {
-                    try {
-                      const sessionDate = new Date(info.start_time).toLocaleDateString();
-                      const sessionTime = new Date(info.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                      await sendStudentDecisionNotification(
-                        info.student_email,
-                        info.student_name,
-                        info.coach_name,
-                        info.title,
-                        sessionDate,
-                        sessionTime,
-                        'approved'
-                      );
-                    } catch (notifyErr) {
-                      console.error('Failed sending approve email to student:', notifyErr);
-                    }
+                  if (infoErr) {
+                    console.error('Error fetching info for email notification:', infoErr);
+                    return;
+                  }
+                  if (!info) {
+                    console.error('No info found for email notification');
+                    return;
+                  }
+                  try {
+                    const sessionDate = new Date(info.start_time).toLocaleDateString();
+                    const sessionTime = new Date(info.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    await sendStudentDecisionNotification(
+                      info.student_email,
+                      info.student_name,
+                      info.coach_name,
+                      info.title,
+                      sessionDate,
+                      sessionTime,
+                      'approved'
+                    );
+                  } catch (notifyErr) {
+                    console.error('Failed sending approve email to student:', notifyErr);
                   }
                 }
               );
-
-              // Send response before async email notification
-              res.json({
-                message: 'Booking approved successfully',
-                booking: { id: bookingId, status: 'confirmed' }
-              });
               
               // Email notification happens asynchronously after response is sent
             }
