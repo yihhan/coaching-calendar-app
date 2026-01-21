@@ -1259,10 +1259,16 @@ app.put('/api/bookings/:id/approve', authenticateToken, (req, res) => {
       return res.status(400).json({ error: 'Invalid booking ID' });
     }
 
+    const coachId = typeof req.user.id === 'string' ? parseInt(req.user.id, 10) : req.user.id;
+    if (isNaN(coachId)) {
+      console.error('Invalid coach ID:', req.user.id);
+      return res.status(500).json({ error: 'Invalid coach ID' });
+    }
+
     // First check if the booking exists and belongs to a session owned by this coach
     db.get(
       'SELECT b.*, s.coach_id FROM bookings b JOIN sessions s ON b.session_id = s.id WHERE b.id = ? AND s.coach_id = ?',
-      [bookingId, req.user.id],
+      [bookingId, coachId],
       (err, booking) => {
         if (err) {
           console.error('Error fetching booking:', err);
