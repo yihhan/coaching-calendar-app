@@ -1278,10 +1278,21 @@ app.put('/api/bookings/:id/approve', authenticateToken, (req, res) => {
         [booking.session_id],
         (err, sessionInfo) => {
           if (err) {
+            console.error('Error checking session capacity:', err);
             return res.status(500).json({ error: 'Database error' });
           }
 
-          if (sessionInfo.confirmed_count >= sessionInfo.max_students) {
+          if (!sessionInfo) {
+            console.error('Session info not found for booking:', bookingId);
+            return res.status(404).json({ error: 'Session not found' });
+          }
+
+          // Handle case where confirmed_count might be null or undefined
+          // COUNT() returns a number, but check if sessionInfo exists
+          const confirmedCount = sessionInfo ? (parseInt(sessionInfo.confirmed_count) || 0) : 0;
+          const maxStudents = sessionInfo ? (parseInt(sessionInfo.max_students) || 1) : 1;
+
+          if (confirmedCount >= maxStudents) {
             return res.status(400).json({ error: 'Session is full' });
           }
 
@@ -1289,8 +1300,9 @@ app.put('/api/bookings/:id/approve', authenticateToken, (req, res) => {
           db.run(
             'UPDATE bookings SET status = "confirmed" WHERE id = ?',
             [bookingId],
-            function(err) {
-              if (err) {
+            function(updateErr) {
+              if (updateErr) {
+                console.error('Error updating booking status:', updateErr);
                 return res.status(500).json({ error: 'Database error' });
               }
 
@@ -1324,10 +1336,13 @@ app.put('/api/bookings/:id/approve', authenticateToken, (req, res) => {
                 }
               );
 
+              // Send response before async email notification
               res.json({
                 message: 'Booking approved successfully',
                 booking: { id: bookingId, status: 'confirmed' }
               });
+              
+              // Email notification happens asynchronously after response is sent
             }
           );
         }
