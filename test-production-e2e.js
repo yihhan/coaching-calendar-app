@@ -9,7 +9,7 @@
 const https = require('https');
 const http = require('http');
 
-const PRODUCTION_URL = 'https://calla.sg';
+const PRODUCTION_URL = 'https://www.calla.sg';
 const TEST_USER = {
   coach: {
     name: 'Test Coach E2E',
@@ -257,8 +257,8 @@ async function testSessionCreation() {
   const sessionData = {
     title: 'E2E Test Session',
     description: 'This session was created during end-to-end testing',
-    start_time: tomorrow.toISOString(),
-    end_time: endTime.toISOString(),
+    start_time: formatDateTime(tomorrow),
+    end_time: formatDateTime(endTime),
     max_students: 2,
     price: 25,
     repeat_interval: 'none',
