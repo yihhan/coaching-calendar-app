@@ -839,22 +839,21 @@ app.post('/api/sessions', authenticateToken, [
     const eStr = formatDateTime(e);
 
     // Overlap check for this occurrence
+    // Two time ranges overlap if: start1 < end2 AND end1 > start2
     db.get(
       `SELECT id FROM sessions 
        WHERE coach_id = ? 
        AND status IN ('available', 'booked')
-       AND (
-         (start_time < ? AND end_time > ?) OR
-         (start_time < ? AND end_time > ?) OR
-         (start_time >= ? AND end_time <= ?)
-       )`,
-      [req.user.id, eStr, sStr, sStr, eStr, sStr, eStr],
+       AND start_time < ? 
+       AND end_time > ?`,
+      [req.user.id, eStr, sStr],
       (err, overlappingSession) => {
         if (err) {
           return res.status(500).json({ error: 'Database error' });
         }
 
         if (overlappingSession) {
+          console.log(`⚠️  Session creation blocked: Overlap detected for coach ${req.user.id} at ${sStr}-${eStr} (overlaps with session ${overlappingSession.id})`);
           conflicts.push({ index, start_time: sStr, end_time: eStr });
           return processOccurrence(index + 1);
         }
@@ -869,9 +868,11 @@ app.post('/api/sessions', authenticateToken, [
           [req.user.id, title, description, sStr, eStr, max_students, price, visibility],
           function(insertErr) {
             if (insertErr) {
+              console.error(`❌ Error inserting session:`, insertErr);
               return res.status(500).json({ error: 'Database error' });
             }
             const sessionId = this.lastID;
+            console.log(`✅ Session created: ID ${sessionId} for coach ${req.user.id} at ${sStr}-${eStr}`);
             created.push({ id: sessionId, title, description, start_time: sStr, end_time: eStr, max_students, price, visibility });
 
             // If visibility is 'whitelist', add students to whitelist
